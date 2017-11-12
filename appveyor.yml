@@ -22,6 +22,9 @@ on_success:
   - git config --global user.email "%GIT_USER_EMAIL%"
   - git config --global user.name "%GIT_USER_NAME%"
 
+  - git config --global user.email
+  - git config --global user.name
+  
   - hexo deploy
 
   - git clone --depth 5 -q --branch=%TARGET_BRANCH% %STATIC_SITE_REPO% %TEMP%\static-site
