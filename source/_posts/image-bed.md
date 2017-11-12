@@ -1,7 +1,10 @@
 ---
 title: 免费图床网站
 date: 2017-11-09 16:34:29
-tags: Hexo
+tags:
+	- 博客
+	- 资源分享
+categories: 博客
 ---
 
 ### 1.SM.MS
@@ -10,6 +13,8 @@ tags: Hexo
 图床支持外链和https，支持API调用接口进行图片上传。
 图床网址：[https://sm.ms](https://sm.ms)
 上传成功后，既可以获取URL、HTML、Markdown等多种形式的图片地址，如：https://ooo.0o0.ooo/2017/05/04/590b3f09b4f27.jpg
+
+<!-- more -->
 
 ### 2.贴图库
 
@@ -38,5 +43,11 @@ URL 形式：http://www.z4a.net/images/2017/05/04/1147.jpg
 限制：每日上传图片限制数20张，网站页面上有广告。
 图床网址：[http://pic.xiaojianjian.net/](http://pic.xiaojianjian.net/)
 
-使用贴图库服务
+### 6. LightPIC凸窗
+图床网址： https://lightpic.info/
+
+### 7. 七牛云存储
+图床网址：https://portal.qiniu.com
+
+### 图床工具
 http://tuchuang.org/
