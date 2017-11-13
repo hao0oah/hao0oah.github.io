@@ -1,0 +1,70 @@
+
+1. appVeyor 在线持续集成和部署
+2. Mac搭建流媒体服务器，使用samba协议
+3. Mac ntfs硬盘读写
+4. 图片分享，音乐分享，理想
+5. 美剧网址分享
+6. 冬天敷面膜
+7. 用胶带粘住玻璃
+
+
+
+Sublime Text 3, Build 3143 License
+2017-11-14，亲测可用
+
+—– BEGIN LICENSE —–
+TwitterInc
+200 User License
+EA7E-890007
+1D77F72E 390CDD93 4DCBA022 FAF60790
+61AA12C0 A37081C5 D0316412 4584D136
+94D7F7D4 95BC8C1C 527DA828 560BB037
+D1EDDD8C AE7B379F 50C9D69D B35179EF
+2FE898C4 8E4277A8 555CE714 E1FB0E43
+D5D52613 C3D12E98 BC49967F 7652EED2
+9D2D2E61 67610860 6D338B72 5CF95C69
+E36B85CC 84991F19 7575D828 470A92AB
+—— END LICENSE ——
+
+
+
+持续集成工具：
+Travis-ci
+Circle-ci
+daocloud
+flow.ci
+AppVeyor
+
+
+Mac 挂载可读写NTFS硬盘
+
+第一步：查看磁盘设备文件名
+diskutil list
+
+第二步：新建挂载点
+mkdir ~/Desktop/Windows
+
+第三步：推出磁盘（重新挂载）
+sudo umount /dev/disk2s1
+
+第四部：重新挂载
+sudo mount_ntfs -o rw,nobrowse /dev/disk2s1 ~/Desktop/Windows
+
+sudo nano /etc/fstab
+
+LABEL=移动硬盘 none ntfs rw,auto,nobrowse
+
+西部数据：
+UUID=157C8FC0-FC98-42EC-B1B8-85D6D59A1843 none ntfs rw,auto,nobrowse
+
+ITCEO：
+UUID=1768414E-A6F3-4F40-8D77-B00CB157F98E none ntfs rw,auto,nobrowse
+LABEL=IT-CEO none ntfs rw,auto,nobrowse
+
+
+#### 只有这种方法可以实现
+sudo chown -R $(whoami) /usr/local/lib/pkgconfig
+
+sudo mkdir /Volumes/NTFS
+sudo umount /dev/disk2s1
+sudo /usr/local/bin/ntfs-3g /dev/disk2s1 /Volumes/NTFS -olocal -oallow_other
