@@ -43,7 +43,7 @@ categories: 博客
 `git config --global user.email "github邮箱"`
 
 
-#### 4. Hexo初始化博客框架
+#### 4. 初始化博客框架
 
 [Hexo官方文档](https://hexo.io/zh-cn/docs/)
 
@@ -72,9 +72,9 @@ categories: 博客
 
 #### 5. 配置博客
 
-在本地博客目录下，打开`_config.yml`文件，修改参数信息
+在博客主目录下，打开`_config.yml`文件，修改参数信息
 
-- 修改网站基本信息
+- 网站基本信息
 ```
 title: 主标题
 subtitle: 副标题
@@ -97,14 +97,14 @@ deploy:
 `hexo server`
 在浏览器输入`http://localhost:4000`就可以看见默认的博客了。
 
-- 部署到Github代码库中
+- 部署到Github代码库
 `hexo deploy`
 
 - 如果部署出现错误，执行以下命令：
 `npm install hexo-deployer-git --save`
 
 
-#### 6. 使用Hexo命令
+#### 6. 常用的Hexo命令
 
 ```
 hexo help #查看帮助
