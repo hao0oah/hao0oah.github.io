@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="hao0oah&#39;s blog">
 <meta property="og:description" content="本文是基于Windows平台，以最简单的步骤，展示我自己搭建的过程。  1. 准备工作 注册一个Github账户 安装Node.js，Node.js教程 安装Git，Git教程">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-12T14:10:23.399Z">
+<meta property="og:updated_time" content="2017-11-13T05:27:07.504Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Github+Hexo博客搭建过程">
 <meta name="twitter:description" content="本文是基于Windows平台，以最简单的步骤，展示我自己搭建的过程。  1. 准备工作 注册一个Github账户 安装Node.js，Node.js教程 安装Git，Git教程">
@@ -383,7 +383,7 @@
 <li><p>设置git全局变量<br><code>git config --global user.name &quot;github用户名&quot;</code><br><code>git config --global user.email &quot;github邮箱&quot;</code></p>
 </li>
 </ul>
-<h4 id="4-Hexo初始化博客框架"><a href="#4-Hexo初始化博客框架" class="headerlink" title="4. Hexo初始化博客框架"></a>4. Hexo初始化博客框架</h4><p><a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">Hexo官方文档</a></p>
+<h4 id="4-初始化博客框架"><a href="#4-初始化博客框架" class="headerlink" title="4. 初始化博客框架"></a>4. 初始化博客框架</h4><p><a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">Hexo官方文档</a></p>
 <ul>
 <li><p>可以使用cmd或者Git Bash命令行窗口，来安装Hexo：<br><code>npm install -g hexo-cli</code></p>
 </li>
@@ -395,9 +395,9 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">├── _config.yml //网站的配置信息，可以在此配置大部分的参数。</span><br><span class="line">├── package.json</span><br><span class="line">├── scaffolds //模版文件夹。当新建文章时，Hexo会根据scaffold来建立文件。</span><br><span class="line">├── source //资源文件夹是存放用户资源的地方。</span><br><span class="line">| ├── _drafts</span><br><span class="line">| └── _posts</span><br><span class="line">└── themes //主题文件夹。Hexo会根据主题来生成静态页面。</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<h4 id="5-配置博客"><a href="#5-配置博客" class="headerlink" title="5. 配置博客"></a>5. 配置博客</h4><p>在本地博客目录下，打开<code>_config.yml</code>文件，修改参数信息</p>
+<h4 id="5-配置博客"><a href="#5-配置博客" class="headerlink" title="5. 配置博客"></a>5. 配置博客</h4><p>在博客主目录下，打开<code>_config.yml</code>文件，修改参数信息</p>
 <ul>
-<li><p>修改网站基本信息</p>
+<li><p>网站基本信息</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">title: 主标题</span><br><span class="line">subtitle: 副标题</span><br><span class="line">description: 网页描述</span><br><span class="line">author: 作者名</span><br><span class="line">language: zh-CN</span><br><span class="line">timezone: Asia/Shanghai</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>部署到Github的配置</p>
@@ -405,12 +405,12 @@
 </li>
 <li><p>预览本地博客<br><code>hexo generate</code><br><code>hexo server</code><br>在浏览器输入<code>http://localhost:4000</code>就可以看见默认的博客了。</p>
 </li>
-<li><p>部署到Github代码库中<br><code>hexo deploy</code></p>
+<li><p>部署到Github代码库<br><code>hexo deploy</code></p>
 </li>
 <li><p>如果部署出现错误，执行以下命令：<br><code>npm install hexo-deployer-git --save</code></p>
 </li>
 </ul>
-<h4 id="6-使用Hexo命令"><a href="#6-使用Hexo命令" class="headerlink" title="6. 使用Hexo命令"></a>6. 使用Hexo命令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">hexo help #查看帮助</span><br><span class="line">hexo init #初始化一个目录</span><br><span class="line">hexo new &quot;postName&quot; #新建文章</span><br><span class="line">hexo new page &quot;pageName&quot; #新建页面</span><br><span class="line">hexo generate #生成网页，可以在 public 目录查看整个网站的文件</span><br><span class="line">hexo server #本地预览，&apos;Ctrl+C&apos;关闭</span><br><span class="line">hexo deploy #部署.deploy目录到Github上</span><br><span class="line">hexo clean #清除缓存，建议每次执行命令前先清理缓存</span><br></pre></td></tr></table></figure>
+<h4 id="6-常用的Hexo命令"><a href="#6-常用的Hexo命令" class="headerlink" title="6. 常用的Hexo命令"></a>6. 常用的Hexo命令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">hexo help #查看帮助</span><br><span class="line">hexo init #初始化一个目录</span><br><span class="line">hexo new &quot;postName&quot; #新建文章</span><br><span class="line">hexo new page &quot;pageName&quot; #新建页面</span><br><span class="line">hexo generate #生成网页，可以在 public 目录查看整个网站的文件</span><br><span class="line">hexo server #本地预览，&apos;Ctrl+C&apos;关闭</span><br><span class="line">hexo deploy #部署.deploy目录到Github上</span><br><span class="line">hexo clean #清除缓存，建议每次执行命令前先清理缓存</span><br></pre></td></tr></table></figure>
 <h4 id="7-使用Next主题"><a href="#7-使用Next主题" class="headerlink" title="7. 使用Next主题"></a>7. 使用Next主题</h4><p><a href="http://theme-next.iissnan.com/" target="_blank" rel="external">Next主题官网</a></p>
 <ul>
 <li><p>下载主题包<br><code>cd &lt;yourFolder&gt; #切换到本地博客主目录</code><br><code>git clone https://github.com/iissnan/hexo-theme-next themes/next</code></p>
@@ -610,7 +610,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-准备工作"><span class="nav-number">1.</span> <span class="nav-text">1. 准备工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-创建Github仓库"><span class="nav-number">2.</span> <span class="nav-text">2. 创建Github仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-配置SSH-Key"><span class="nav-number">3.</span> <span class="nav-text">3. 配置SSH Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-Hexo初始化博客框架"><span class="nav-number">4.</span> <span class="nav-text">4. Hexo初始化博客框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-配置博客"><span class="nav-number">5.</span> <span class="nav-text">5. 配置博客</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-使用Hexo命令"><span class="nav-number">6.</span> <span class="nav-text">6. 使用Hexo命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-使用Next主题"><span class="nav-number">7.</span> <span class="nav-text">7. 使用Next主题</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#参考1，参考2，参考3，参考4，参考5，参考6"><span class="nav-number">7.0.1.</span> <span class="nav-text">参考1，参考2，参考3，参考4，参考5，参考6</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-准备工作"><span class="nav-number">1.</span> <span class="nav-text">1. 准备工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-创建Github仓库"><span class="nav-number">2.</span> <span class="nav-text">2. 创建Github仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-配置SSH-Key"><span class="nav-number">3.</span> <span class="nav-text">3. 配置SSH Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-初始化博客框架"><span class="nav-number">4.</span> <span class="nav-text">4. 初始化博客框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-配置博客"><span class="nav-number">5.</span> <span class="nav-text">5. 配置博客</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-常用的Hexo命令"><span class="nav-number">6.</span> <span class="nav-text">6. 常用的Hexo命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-使用Next主题"><span class="nav-number">7.</span> <span class="nav-text">7. 使用Next主题</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#参考1，参考2，参考3，参考4，参考5，参考6"><span class="nav-number">7.0.1.</span> <span class="nav-text">参考1，参考2，参考3，参考4，参考5，参考6</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
