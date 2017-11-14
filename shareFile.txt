@@ -93,7 +93,6 @@ Find ://\s+
 Replace: 
 
 
-
 // 安装hexo
 npm install hexo
 // 注意这里不需要hexo初始化：hexo init；否则之前的hexo配置参数会重置
@@ -102,6 +101,8 @@ npm install
 // 安装部署相关配置
 npm install hexo-deployer-git
 
+# 解决出现"Error: Cannot find module 'hexo-util'"的问题
+npm install -- save-dev hexo-util
 
 // 添加源文件
 git add .
@@ -148,3 +149,7 @@ artifacts:
   - SETLOCAL EnableDelayedExpansion & robocopy "%APPVEYOR_BUILD_FOLDER%\public" "%TEMP%\static-site" /e & IF !ERRORLEVEL! EQU 1 (exit 0) ELSE (IF !ERRORLEVEL! EQU 3 (exit 0) ELSE (exit 1))
   - git add -A
   - if "%APPVEYOR_REPO_BRANCH%"=="master" if not defined APPVEYOR_PULL_REQUEST_NUMBER (git diff --quiet --exit-code --cached || git commit -m "Update Static Site" && git push origin %TARGET_BRANCH% && appveyor AddMessage "Static Site Updated")
+
+
+git config --global user.name bjwuyu1
+git config --global user.email wuyu@jd.com
