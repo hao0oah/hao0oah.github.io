@@ -25,7 +25,7 @@ categories: 博客
 
 ### 3.贴图库
 
-图床网址：[https://sm.ms](https://sm.ms)
+图床网址：[http://www.tietuku.com/](http://www.tietuku.com/)
 说明：未登录单次只能上传1张，登录后增加至300张，单张图片不可超过10M，免费版图片**只能保存7天**，这就比较坑了。图床支持外链，支持调用接口进行图片上传。上传成功后，可以获取URL、HTML、UBB、Markdown等形式的图片地址。
 ![Mountain.jpg](http://i4.bvimg.com/618166/426af75851b1f073.jpg)
 

@@ -68,3 +68,83 @@ sudo chown -R $(whoami) /usr/local/lib/pkgconfig
 sudo mkdir /Volumes/NTFS
 sudo umount /dev/disk2s1
 sudo /usr/local/bin/ntfs-3g /dev/disk2s1 /Volumes/NTFS -olocal -oallow_other
+
+
+
+
+[正则表达式用法总结](https://github.com/fwon/blog/issues/9)
+
+### EditPlus 将代码中//注释转成/* */注释
+
+# 2个表达式，一次操作完成注释转换
+Find: (//\s+)(.*)
+Replace: /**\n\t * \2\n\t */
+
+1. 
+# Find: 匹配所有的//注释
+Find: //\s+.* 
+# Replace: 将//注释内容加到/* */中
+Replace: /**\n\t *\0\n\t */
+
+2.
+# Find: 匹配所有//和空格
+Find ://\s+
+# Replace: 替换成空格即可
+Replace: 
+
+
+
+// 安装hexo
+npm install hexo
+// 注意这里不需要hexo初始化：hexo init；否则之前的hexo配置参数会重置
+// 安装依赖库
+npm install
+// 安装部署相关配置
+npm install hexo-deployer-git
+
+
+// 添加源文件
+git add .
+// git提交
+git commit -m ""
+// 先拉原来Github分支上的源文件到本地，进行合并
+git pull origin 分支名
+// 比较解决前后版本冲突后，push源文件到Github的分支
+git push origin 分支名
+
+
+
+git init
+git add .
+git commit
+
+git remote add origin https://github.com/hao0oah/hao0oah.github.io.source.git
+git checkout -b master
+git push -u origin master
+
+
+从代码库删除该文件夹，不被管理
+git rm --cache -r themes\
+
+
+# 查看远程代码库
+git remote
+# 移出远程代码库链接
+git remote remove origin
+
+git rm --cache *
+
+
+
+
+artifacts:
+  - path: public
+
+
+  - git clone --depth 5 -q --branch=%TARGET_BRANCH% %STATIC_SITE_REPO% %TEMP%\static-site
+  - cd %TEMP%\static-site
+  - del * /f /q
+  - for /d %%p IN (*) do rmdir "%%p" /s /q
+  - SETLOCAL EnableDelayedExpansion & robocopy "%APPVEYOR_BUILD_FOLDER%\public" "%TEMP%\static-site" /e & IF !ERRORLEVEL! EQU 1 (exit 0) ELSE (IF !ERRORLEVEL! EQU 3 (exit 0) ELSE (exit 1))
+  - git add -A
+  - if "%APPVEYOR_REPO_BRANCH%"=="master" if not defined APPVEYOR_PULL_REQUEST_NUMBER (git diff --quiet --exit-code --cached || git commit -m "Update Static Site" && git push origin %TARGET_BRANCH% && appveyor AddMessage "Static Site Updated")
