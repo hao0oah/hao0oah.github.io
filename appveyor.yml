@@ -11,8 +11,6 @@ install:
   - npm install hexo-deployer-git --save
 
 build_script:
-  - pwd
-  - ls -la
   - hexo generate
 
 on_success:
@@ -21,10 +19,7 @@ on_success:
   - git config --global user.email "%GIT_USER_EMAIL%"
   - git config --global user.name "%GIT_USER_NAME%"
 
-  - pwd
-  - ls -la
   - mkdir %APPVEYOR_BUILD_FOLDER%\.deploy_git
+  # 从Github上拉取代码库版本，可以保留提交记录；如果直接部署相当于一个新的代码库提交，覆盖了之前的提交版本记录
   - git clone --depth 5 -q --branch=%TARGET_BRANCH% %STATIC_SITE_REPO% %APPVEYOR_BUILD_FOLDER%\.deploy_git
-  - ls -la %APPVEYOR_BUILD_FOLDER%\.deploy_git
   - hexo deploy
-  - ls -la

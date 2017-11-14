@@ -37,7 +37,11 @@ rss:
 footer:
   # Specify the date when the site was setup.
   # If not defined, current year will be used.
+<<<<<<< HEAD
   since: 2017
+=======
+  #since: 2015
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
 
   # Icon between year and copyright info.
   icon: user
@@ -85,9 +89,15 @@ index_with_subtitle: false
 # Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, question icon will be loaded.
 menu:
   home: / || home
+<<<<<<< HEAD
   about: /about/ || user
   tags: /tags/ || tags
   categories: /categories/ || th
+=======
+  #about: /about/ || user
+  #tags: /tags/ || tags
+  #categories: /categories/ || th
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
   archives: /archives/ || archive
   #schedule: /schedule/ || calendar
   #sitemap: /sitemap.xml || sitemap
@@ -96,6 +106,7 @@ menu:
 # Enable/Disable menu icons.
 menu_icons:
   enable: true
+<<<<<<< HEAD
   # Icon Mapping.
   home: home
   about: user
@@ -103,16 +114,26 @@ menu_icons:
   tags: tags
   archives: archive
   commonweal: heartbeat
+=======
+
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
 
 # ---------------------------------------------------------------
 # Scheme Settings
 # ---------------------------------------------------------------
 
 # Schemes
+<<<<<<< HEAD
 #scheme: Muse
 #scheme: Mist
 #scheme: Pisces
 scheme: Gemini
+=======
+scheme: Muse
+#scheme: Mist
+#scheme: Pisces
+#scheme: Gemini
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
 
 
 # ---------------------------------------------------------------
@@ -124,12 +145,18 @@ scheme: Gemini
 # Key is the link label showing to end users.
 # Value before `||` delimeter is the target permalink.
 # Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, globe icon will be loaded.
+<<<<<<< HEAD
 social:
   GitHub: https://github.com/hao0oah || github
   微博: https://weibo.com/u/2208859553 || weibo
   #E-Mail: mailto:hao0oah@qq.com || envelope
   #豆瓣: https://www.douban.com/people/80103808 || douban
   #知乎: https://www.zhihu.com/people/hao123-99 || zhihu
+=======
+#social:
+  #GitHub: https://github.com/yourname || github
+  #E-Mail: mailto:yourname@gmail.com || envelope
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
   #Google: https://plus.google.com/yourname || google
   #Twitter: https://twitter.com/yourname || twitter
   #FB Page: https://www.facebook.com/yourname || facebook
@@ -143,11 +170,14 @@ social_icons:
   enable: true
   icons_only: false
   transition: false
+<<<<<<< HEAD
   GitHub: github
   微博: weibo
   #E-Mail: email
   #豆瓣: douban
   #知乎: zhihu
+=======
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
 
 # Blog rolls
 links_icon: link
@@ -160,7 +190,11 @@ links_layout: block
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.gif
 # in site  directory(source/uploads): /uploads/avatar.gif
+<<<<<<< HEAD
 avatar: /images/avatar2.jpg
+=======
+#avatar: /images/avatar.gif
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
 
 # Table Of Contents in the Sidebar
 toc:
@@ -283,7 +317,11 @@ custom_logo:
 # Available value:
 #    normal | night | night eighties | night blue | night bright
 # https://github.com/chriskempson/tomorrow-theme
+<<<<<<< HEAD
 highlight_theme: night eighties
+=======
+highlight_theme: normal
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
 
 
 # ---------------------------------------------------------------
@@ -359,7 +397,11 @@ han: false
 #swiftype_key:
 
 # Baidu Analytics ID
+<<<<<<< HEAD
 baidu_analytics: 605fd8c020940cdc146f749c7c622b55
+=======
+#baidu_analytics:
+>>>>>>> cde17b1e0e12dbf4156ca19110bfe9cd2da5d2ce
 
 # Duoshuo ShortName
 #duoshuo_shortname:

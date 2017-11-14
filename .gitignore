@@ -3,3 +3,5 @@ public/
 node_modules/
 *.log
 .deploy_*/
+.DS_Store
+*/.DS_Store
