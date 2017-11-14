@@ -1,3 +1,4 @@
+nodejs_version: "6"
 clone_depth: 5
 environment:
   access_token:
