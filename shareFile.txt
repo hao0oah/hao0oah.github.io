@@ -132,9 +132,28 @@ git rm --cache -r themes\
 git remote
 # 移出远程代码库链接
 git remote remove origin
-
+# 删除git缓存文件
 git rm --cache *
 
+
+对于已经存在的博客
+1. 创建hexo分支，默认从master分支merge过来。
+2. 在本地博客目录，`git init`, `git checkout -b hexo`#创建本地分支hexo, `git add .`,`git commit -m "xxx"`,
+
+# 添加远程库
+`git remote add origin https://github.com/xxx/xxx.github.io.git`
+
+# 推送本地hexo分支到远程仓库的hexo分支，如果hexo分支不存在会新建hexo分支。（前提是当前的本地分支是hexo分支）
+`git push origin hexo` 
+
+# push本地master分支到远程hexo分支，如果hexo分支不存在则新建hexo分支。
+`git push origin master:hexo`
+
+# 如果分支不同步，则使用强推
+`git push -f origin master:hexo`
+
+# 删除远程分支hexo
+`git push origin :hexo`
 
 
 
