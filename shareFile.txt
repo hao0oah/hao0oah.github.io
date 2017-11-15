@@ -172,3 +172,7 @@ artifacts:
 
 git config --global user.name bjwuyu1
 git config --global user.email wuyu@jd.com
+
+# Mac解决端口占用
+sudo lsof -i tcp:port
+kill -9 pid
