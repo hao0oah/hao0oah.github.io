@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="hao0oah&#39;s blog">
 <meta property="og:description" content="本文是基于Windows平台，以最简单的步骤，展示我自己搭建的过程。  1. 准备工作 注册一个Github账户 安装Node.js，Node.js教程 安装Git，Git教程">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-15T10:30:14.102Z">
+<meta property="og:updated_time" content="2017-11-15T18:11:58.352Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Github+Hexo博客搭建过程">
 <meta name="twitter:description" content="本文是基于Windows平台，以最简单的步骤，展示我自己搭建的过程。  1. 准备工作 注册一个Github账户 安装Node.js，Node.js教程 安装Git，Git教程">
@@ -366,9 +366,9 @@
 <p>本文是基于Windows平台，以最简单的步骤，展示我自己搭建的过程。</p>
 </blockquote>
 <h4 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h4><ul>
-<li><a href="https://github.com/join?source=header-home" target="_blank" rel="external">注册</a>一个Github账户</li>
-<li><a href="https://nodejs.org/en/" target="_blank" rel="external">安装</a>Node.js，<a href="http://nodejs.jakeyu.top/index.html" target="_blank" rel="external">Node.js教程</a></li>
-<li><a href="https://github.com/waylau/git-for-win" target="_blank" rel="external">安装</a>Git，<a href="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="external">Git教程</a></li>
+<li><a href="https://github.com/join?source=header-home" target="_blank" rel="noopener">注册</a>一个Github账户</li>
+<li><a href="https://nodejs.org/en/" target="_blank" rel="noopener">安装</a>Node.js，<a href="http://nodejs.jakeyu.top/index.html" target="_blank" rel="noopener">Node.js教程</a></li>
+<li><a href="https://github.com/waylau/git-for-win" target="_blank" rel="noopener">安装</a>Git，<a href="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="noopener">Git教程</a></li>
 </ul>
 <a id="more"></a>
 <h4 id="2-创建Github仓库"><a href="#2-创建Github仓库" class="headerlink" title="2. 创建Github仓库"></a>2. 创建Github仓库</h4><p>登录你的GitHub账户，新建一个名为<code>username.github.io</code>的仓库，<strong>username</strong>就是你的Github用户名，之后就可以通过<code>username.github.io</code>来访问博客了。</p>
@@ -383,7 +383,7 @@
 <li><p>设置git全局变量<br><code>git config --global user.name &quot;github用户名&quot;</code><br><code>git config --global user.email &quot;github邮箱&quot;</code></p>
 </li>
 </ul>
-<h4 id="4-初始化博客框架"><a href="#4-初始化博客框架" class="headerlink" title="4. 初始化博客框架"></a>4. 初始化博客框架</h4><p><a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">Hexo官方文档</a></p>
+<h4 id="4-初始化博客框架"><a href="#4-初始化博客框架" class="headerlink" title="4. 初始化博客框架"></a>4. 初始化博客框架</h4><p><a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="noopener">Hexo官方文档</a></p>
 <ul>
 <li><p>可以使用cmd或者Git Bash命令行窗口，来安装Hexo：<br><code>npm install -g hexo-cli</code></p>
 </li>
@@ -411,14 +411,14 @@
 </li>
 </ul>
 <h4 id="6-常用的Hexo命令"><a href="#6-常用的Hexo命令" class="headerlink" title="6. 常用的Hexo命令"></a>6. 常用的Hexo命令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">hexo help #查看帮助</span><br><span class="line">hexo init #初始化一个目录</span><br><span class="line">hexo new &quot;postName&quot; #新建文章</span><br><span class="line">hexo new page &quot;pageName&quot; #新建页面</span><br><span class="line">hexo generate #生成网页，可以在 public 目录查看整个网站的文件</span><br><span class="line">hexo server #本地预览，&apos;Ctrl+C&apos;关闭</span><br><span class="line">hexo deploy #部署.deploy目录到Github上</span><br><span class="line">hexo clean #清除缓存，建议每次执行命令前先清理缓存</span><br></pre></td></tr></table></figure>
-<h4 id="7-使用Next主题"><a href="#7-使用Next主题" class="headerlink" title="7. 使用Next主题"></a>7. 使用Next主题</h4><p><a href="http://theme-next.iissnan.com/" target="_blank" rel="external">Next主题官网</a></p>
+<h4 id="7-使用Next主题"><a href="#7-使用Next主题" class="headerlink" title="7. 使用Next主题"></a>7. 使用Next主题</h4><p><a href="http://theme-next.iissnan.com/" target="_blank" rel="noopener">Next主题官网</a></p>
 <ul>
 <li><p>下载主题包<br><code>cd &lt;yourFolder&gt; #切换到本地博客主目录</code><br><code>git clone https://github.com/iissnan/hexo-theme-next themes/next</code></p>
 </li>
 <li><p>启用Next主题<br>打开主目录下的<code>_config.yml</code>文件，找到theme字段，并将其值更改为next即可。</p>
 </li>
 </ul>
-<h6 id="参考1，参考2，参考3，参考4，参考5，参考6"><a href="#参考1，参考2，参考3，参考4，参考5，参考6" class="headerlink" title="参考1，参考2，参考3，参考4，参考5，参考6"></a><a href="http://blog.liuxianan.com/build-blog-website-by-hexo-github.html" target="_blank" rel="external">参考1</a>，<a href="https://getwang.github.io/2017/09/03/%E4%BD%BF%E7%94%A8github-hexo%E6%90%AD%E5%BB%BA%E5%85%8D%E8%B4%B9%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" target="_blank" rel="external">参考2</a>，<a href="https://zhangslob.github.io/2017/02/28/%E6%95%99%E4%BD%A0%E5%85%8D%E8%B4%B9%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%EF%BC%8CHexo-Github/" target="_blank" rel="external">参考3</a>，<a href="http://www.jianshu.com/p/701b1095da11" target="_blank" rel="external">参考4</a>，<a href="http://www.jianshu.com/p/61987cec0fad#" target="_blank" rel="external">参考5</a>，<a href="http://www.jianshu.com/p/380290deb8f0" target="_blank" rel="external">参考6</a></h6>
+<h6 id="参考1，参考2，参考3，参考4，参考5，参考6"><a href="#参考1，参考2，参考3，参考4，参考5，参考6" class="headerlink" title="参考1，参考2，参考3，参考4，参考5，参考6"></a><a href="http://blog.liuxianan.com/build-blog-website-by-hexo-github.html" target="_blank" rel="noopener">参考1</a>，<a href="https://getwang.github.io/2017/09/03/%E4%BD%BF%E7%94%A8github-hexo%E6%90%AD%E5%BB%BA%E5%85%8D%E8%B4%B9%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" target="_blank" rel="noopener">参考2</a>，<a href="https://zhangslob.github.io/2017/02/28/%E6%95%99%E4%BD%A0%E5%85%8D%E8%B4%B9%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%EF%BC%8CHexo-Github/" target="_blank" rel="noopener">参考3</a>，<a href="http://www.jianshu.com/p/701b1095da11" target="_blank" rel="noopener">参考4</a>，<a href="http://www.jianshu.com/p/61987cec0fad#" target="_blank" rel="noopener">参考5</a>，<a href="http://www.jianshu.com/p/380290deb8f0" target="_blank" rel="noopener">参考6</a></h6>
       
     </div>
     
