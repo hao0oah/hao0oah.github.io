@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="博客,AppVeyor,Hexo," />
+  <meta name="keywords" content="博客,Hexo,AppVeyor," />
 
 
 
@@ -80,7 +80,7 @@
 
 
 <meta name="description" content="前言关于备份Hexo博客源文件，搜索了一遍网上的资料，我感觉比较有意思的有两种方式。一种是将Github上托管的博客版本库创建两个分支，缺点是操作比较繁琐，对于Git新手具有一定的挑战，一不小心可能会搞错；一种是另外创建一个存放博客源文件的Github代码库，利用AppVeyor进行持续集成和自动化部署，缺点是需要创建">
-<meta name="keywords" content="博客,AppVeyor,Hexo">
+<meta name="keywords" content="博客,Hexo,AppVeyor">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo博客源文件备份">
 <meta property="og:url" content="http://yoursite.com/2017/11/13/hexo-appveyor/index.html">
@@ -91,9 +91,10 @@
 <meta property="og:image" content="http://oz572ikp2.bkt.clouddn.com/appveyor_setting_general.jpg">
 <meta property="og:image" content="http://oo0zdjapt.bkt.clouddn.com/Appveyor-e.png">
 <meta property="og:image" content="https://formulahendry.github.io/assets/img/hexo-ci/appveyor-encrypt.png">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/a75c3e80jw1f5z5ovpijjj20oj0mzq64.jpg">
 <meta property="og:image" content="http://oz572ikp2.bkt.clouddn.com/add_webhooks.jpg">
 <meta property="og:image" content="http://oz572ikp2.bkt.clouddn.com/add_webhooks_page.jpg">
-<meta property="og:updated_time" content="2017-11-15T18:11:58.352Z">
+<meta property="og:updated_time" content="2017-12-02T04:46:57.457Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo博客源文件备份">
 <meta name="twitter:description" content="前言关于备份Hexo博客源文件，搜索了一遍网上的资料，我感觉比较有意思的有两种方式。一种是将Github上托管的博客版本库创建两个分支，缺点是操作比较繁琐，对于Git新手具有一定的挑战，一不小心可能会搞错；一种是另外创建一个存放博客源文件的Github代码库，利用AppVeyor进行持续集成和自动化部署，缺点是需要创建两个代码库，依赖一个新的东西AppVeyor。 既然想折腾，那就想点更好玩的吧。">
@@ -178,7 +179,7 @@
       </a>
     </div>
       
-        <p class="site-subtitle">不管怎样的时光，都不算是浪费！</p>
+        <h1 class="site-subtitle" itemprop="description">不管怎样的时光，都不算是浪费！</h1>
       
   </div>
 
@@ -297,7 +298,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hexo博客源文件备份</h1>
+          <h2 class="post-title" itemprop="name headline">Hexo博客源文件备份</h2>
         
 
         <div class="post-meta">
@@ -414,7 +415,8 @@ table th:first-of-type {
 <h4 id="5-添加appveyor-yml配置文件"><a href="#5-添加appveyor-yml配置文件" class="headerlink" title="5.添加appveyor.yml配置文件"></a>5.添加appveyor.yml配置文件</h4><p>接下来，你需要在本地博客的根目录下创建appveyor.yml，具体内容如下，也可以参考我博客的<a href="https://github.com/hao0oah/hao0oah.github.io/blob/hexo/appveyor.yml" target="_blank" rel="noopener">appveyor.yml</a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">clone_depth: 5</span><br><span class="line">environment:</span><br><span class="line">  nodejs_version: 6</span><br><span class="line">  access_token:</span><br><span class="line">    secure: [Your GitHub Access Token]</span><br><span class="line"></span><br><span class="line">install:</span><br><span class="line">  # 解决可能会遇到的模块安装失败的问题</span><br><span class="line">  - ps: Install-Product node $env:nodejs_version</span><br><span class="line">  - node --version</span><br><span class="line">  - npm --version</span><br><span class="line">  - npm install</span><br><span class="line">  - npm install hexo-cli -g</span><br><span class="line">  # 安装hexo deploy工具</span><br><span class="line">  - npm install hexo-deployer-git --save</span><br><span class="line">  # 解决偶尔出现&quot;Error: Cannot find module &apos;hexo-util&apos;&quot;的问题</span><br><span class="line">  - npm install hexo-util --save-dev </span><br><span class="line"></span><br><span class="line">build_script:</span><br><span class="line">  - hexo generate</span><br><span class="line"></span><br><span class="line">on_success:</span><br><span class="line">  - git config --global credential.helper store</span><br><span class="line">  - ps: Add-Content &quot;$env:USERPROFILE\.git-credentials&quot; &quot;https://$($env:access_token):x-oauth-basic@github.com`n&quot;</span><br><span class="line">  - git config --global user.email &quot;%GIT_USER_EMAIL%&quot;</span><br><span class="line">  - git config --global user.name &quot;%GIT_USER_NAME%&quot;</span><br><span class="line"></span><br><span class="line">  - mkdir %APPVEYOR_BUILD_FOLDER%\.deploy_git</span><br><span class="line">  # 从Github上拉取代码库版本，可以保留提交记录；如果直接部署相当于一个新的代码库提交，覆盖了之前的提交版本记录</span><br><span class="line">  - git clone --depth 5 -q --branch=%TARGET_BRANCH% %STATIC_SITE_REPO% %APPVEYOR_BUILD_FOLDER%\.deploy_git</span><br><span class="line">  - hexo deploy</span><br></pre></td></tr></table></figure>
 <p>你需要做的就是替换[Your GitHub Access Token]，关于生成Access Token，可以参考这篇<a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank" rel="noopener">文章</a>。在GitHub生成好Access Token之后，你需要到<a href="https://ci.appveyor.com/tools/encrypt" target="_blank" rel="noopener">AppVeyor加密页面</a>把Access Token加密之后再替换[Your GitHub Access Token]<br><img src="https://formulahendry.github.io/assets/img/hexo-ci/appveyor-encrypt.png" alt=""></p>
-<h4 id="6-设置Github-Webhooks"><a href="#6-设置Github-Webhooks" class="headerlink" title="6.设置Github Webhooks"></a>6.设置Github Webhooks</h4><p>设置完上面的步骤还不能实现自动部署，需要将Github的push事件通知给AppVeyor，这就需要配置Webhooks了。<br>还是在AppVeyor网站中，在该项目的settings中的General页面，找到<code>Webhook URL</code>这一项，复制其中的URL。<br>然后进入Github的博客代码库页面，切换到Settings页，点击左边的Webhooks选项，点击<code>Add Webhooks</code>按钮。<br><img src="http://oz572ikp2.bkt.clouddn.com/add_webhooks.jpg" alt="add_webhooks"></p>
+<h4 id="6-设置Github-Webhooks"><a href="#6-设置Github-Webhooks" class="headerlink" title="6.设置Github Webhooks"></a>6.设置Github Webhooks</h4><p>设置完上面的步骤还不能实现自动部署，需要将Github的push事件通知给AppVeyor，这就需要配置Webhooks了。<br>还是在AppVeyor网站中，在该项目的settings中的General页面，找到<code>Webhook URL</code>这一项，复制其中的URL。<br><img src="https://ws3.sinaimg.cn/large/a75c3e80jw1f5z5ovpijjj20oj0mzq64.jpg" alt="copy_webhooks"></p>
+<p>然后进入Github的博客代码库页面，切换到Settings页，点击左边的Webhooks选项，点击<code>Add Webhooks</code>按钮。<br><img src="http://oz572ikp2.bkt.clouddn.com/add_webhooks.jpg" alt="add_webhooks"></p>
 <p>将复制的URL粘贴到<code>Payload URL</code>中，其他保持默认，点击<code>Add Webhooks</code>按钮保存即可。至此关于AppVeyor的相关配置全部完成。<br><img src="http://oz572ikp2.bkt.clouddn.com/add_webhooks_page.jpg" alt="add_webhooks_page"></p>
 <h3 id="将代码库分支"><a href="#将代码库分支" class="headerlink" title="将代码库分支"></a>将代码库分支</h3><p>如果使用了其他主题，例如NexT，需要先删除<code>themes/next</code>文件夹下的.git目录，否则会出现上传到代码库的next文件夹为空，导致生成的都是空页面。</p>
 <ol>
@@ -455,9 +457,9 @@ table th:first-of-type {
           
             <a href="/tags/博客/" rel="tag"># 博客</a>
           
-            <a href="/tags/AppVeyor/" rel="tag"># AppVeyor</a>
-          
             <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          
+            <a href="/tags/AppVeyor/" rel="tag"># AppVeyor</a>
           
         </div>
       
@@ -479,6 +481,10 @@ table th:first-of-type {
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/02/exchangelib_readme_zh/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -549,7 +555,7 @@ table th:first-of-type {
                 alt="hao0oah" />
             
               <p class="site-author-name" itemprop="name">hao0oah</p>
-              <p class="site-description motion-element" itemprop="description">目前从事Java开发，分享个人工作经验和生活经历</p>
+              <p class="site-description motion-element" itemprop="description"></p>
           </div>
 
           <nav class="site-state motion-element">
@@ -559,7 +565,7 @@ table th:first-of-type {
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -834,6 +840,21 @@ table th:first-of-type {
   
 
   
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
 
   
   
