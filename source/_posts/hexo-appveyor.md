@@ -95,6 +95,8 @@ on_success:
 #### 6.设置Github Webhooks
 设置完上面的步骤还不能实现自动部署，需要将Github的push事件通知给AppVeyor，这就需要配置Webhooks了。
 还是在AppVeyor网站中，在该项目的settings中的General页面，找到`Webhook URL`这一项，复制其中的URL。
+![copy_webhooks](https://ws3.sinaimg.cn/large/a75c3e80jw1f5z5ovpijjj20oj0mzq64.jpg)
+
 然后进入Github的博客代码库页面，切换到Settings页，点击左边的Webhooks选项，点击`Add Webhooks`按钮。
 ![add_webhooks](http://oz572ikp2.bkt.clouddn.com/add_webhooks.jpg)
 
