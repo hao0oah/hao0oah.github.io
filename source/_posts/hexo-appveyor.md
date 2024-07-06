@@ -20,21 +20,24 @@ categories: 博客
 
 开始下面操作之前，假设你已经搭建好本地Hexo博客环境，并已经将博客提交到Github Pages上，且可以正常访问到你的博客。否则请先操作这篇[快速搭建Hexo博客](https://hao0oah.github.io/2017/11/08/github-hexo/)。
 
-
 ### 使用AppVeyor配置自动部署功能
 
-#### 1.注册并登陆AppVeyor
+#### 注册并登陆AppVeyor
+
 访问[AppVeyor登陆](https://ci.appveyor.com/login)页面，使用你的GitHub账号登陆即可。
-![AppVeyor登陆](https://formulahendry.github.io/assets/img/hexo-ci/appveyor-login.png)
+![appveyor-login.png](https://s2.loli.net/2024/07/07/ipgefwqPJxdXNbs.png)
 
-#### 2.添加Project
-在[AppVeyor Projects](https://ci.appveyor.com/projects/new)页面，添加相应的GitHub Repo，格式应为`xxx.github.io`。
+#### 添加Project
 
-#### 3.在该项目的settings中设置General
+在`https://ci.appveyor.com/projects/new`页面，添加相应的GitHub Repo，格式应为`xxx.github.io`。
+
+#### 在该项目的settings中设置General
+
 将`Branches to build`选项改为`Only branches specified below`，然后点击`Add branch`填入hexo，点击最底下的Save按钮保存。该设置是让AppVeyor从代码库的hexo分支拉取代码进行编译。
-![settings-general](http://oz572ikp2.bkt.clouddn.com/appveyor_setting_general.jpg)
+![appveyor_setting_general.jpg](https://s2.loli.net/2024/07/06/DkpcnltmPr7UFuB.jpg)
 
-#### 4.在该项目的settings中设置Envirommemt
+#### 在该项目的settings中设置Envirommemt
+
 添加以下四个变量
 
 <style>
@@ -43,17 +46,17 @@ table th:first-of-type {
 }
 </style>
 
-| KEY | VALUE |
-|:---:|:-----:|
-| STATIC_SITE_REPO | 格式应为`https://github.com/xxx/xxx.github.io.git`|
-| TARGET_BRANCH | 博客网页文件所在分支，使用默认的master |
-| GIT_USER_EMAIL | 注册GitHub的邮箱 |
-| GIT_USER_NAME | 注册GitHub的用户名 |
+| KEY              | VALUE                                          |
+|:----------------:|:----------------------------------------------:|
+| STATIC_SITE_REPO | 格式应为`https://github.com/xxx/xxx.github.io.git` |
+| TARGET_BRANCH    | 博客网页文件所在分支，使用默认的master                         |
+| GIT_USER_EMAIL   | 注册GitHub的邮箱                                    |
+| GIT_USER_NAME    | 注册GitHub的用户名                                   |
 
-![设置Envirommemt](http://oo0zdjapt.bkt.clouddn.com/Appveyor-e.png)
 
-#### 5.添加appveyor.yml配置文件
-接下来，你需要在本地博客的根目录下创建appveyor.yml，具体内容如下，也可以参考我博客的[appveyor.yml](https://github.com/hao0oah/hao0oah.github.io/blob/hexo/appveyor.yml)
+#### 添加appveyor.yml配置文件
+
+接下来，你需要在本地博客的根目录下创建appveyor.yml，具体内容如下：
 
 ```
 clone_depth: 5
@@ -90,45 +93,47 @@ on_success:
 ```
 
 你需要做的就是替换[Your GitHub Access Token]，关于生成Access Token，可以参考这篇[文章](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)。在GitHub生成好Access Token之后，你需要到[AppVeyor加密页面](https://ci.appveyor.com/tools/encrypt)把Access Token加密之后再替换[Your GitHub Access Token]
-![](https://formulahendry.github.io/assets/img/hexo-ci/appveyor-encrypt.png)
+![appveyor-encrypt.png](https://s2.loli.net/2024/07/07/wSINErqWtmonM7O.png)
 
-#### 6.设置Github Webhooks
+#### 设置Github Webhooks
+
 设置完上面的步骤还不能实现自动部署，需要将Github的push事件通知给AppVeyor，这就需要配置Webhooks了。
 还是在AppVeyor网站中，在该项目的settings中的General页面，找到`Webhook URL`这一项，复制其中的URL。
-![copy_webhooks](https://ws3.sinaimg.cn/large/a75c3e80jw1f5z5ovpijjj20oj0mzq64.jpg)
 
 然后进入Github的博客代码库页面，切换到Settings页，点击左边的Webhooks选项，点击`Add Webhooks`按钮。
-![add_webhooks](http://oz572ikp2.bkt.clouddn.com/add_webhooks.jpg)
+![add_webhooks](https://s2.loli.net/2024/07/06/pde4S5jCfTruGa8.jpg)
 
 将复制的URL粘贴到`Payload URL`中，其他保持默认，点击`Add Webhooks`按钮保存即可。至此关于AppVeyor的相关配置全部完成。
-![add_webhooks_page](http://oz572ikp2.bkt.clouddn.com/add_webhooks_page.jpg)
+![add_webhooks_page](https://s2.loli.net/2024/07/06/f6hWGuCLEIV1k3Q.jpg)
 
-
-### 将代码库分支
+### 代码库分支操作
 
 如果使用了其他主题，例如NexT，需要先删除`themes/next`文件夹下的.git目录，否则会出现上传到代码库的next文件夹为空，导致生成的都是空页面。
 
 1. 初始化本地代码库
-`git init`
-2. 创建分支hexo
-`git checkout -b hexo`
-为了方便管理和操作，在本地只创建了hexo分支
-3. 添加和提交代码
-`git add .`,`git commit -m "xxx"`
-4. 添加远程库
-`git remote add origin https://github.com/xxx/xxx.github.io.git`
-5. 提交代码到远程hexo分支
-`git push -u origin hexo`
-该命令会在Github代码库创建hexo分支，并提交代码。`-u`的作用是记住提交到远程仓库的地址和分支，下次提交直接用`git push`就可以了。
+   `git init`
 
+2. 创建分支hexo
+   `git checkout -b hexo`
+   为了方便管理和操作，在本地只创建了hexo分支
+
+3. 添加和提交代码
+   `git add .`,`git commit -m "xxx"`
+
+4. 添加远程库
+   `git remote add origin https://github.com/xxx/xxx.github.io.git`
+
+5. 提交代码到远程hexo分支
+   `git push -u origin hexo`
+   该命令会在Github代码库创建hexo分支，并提交代码。`-u`的作用是记住提交到远程仓库的地址和分支，下次提交直接用`git push`就可以了。
 - 如果你本地不是hexo分支，而是其他分支，如master分支，则需要执行
-`git push -u origin master:hexo`
+  `git push -u origin master:hexo`
 
 - 如果你在远程代码库先创建了hexo分支(从master分支merge过来的)，由于版本不同步，需要强制提交
-`git push -f origin hexo`
+  `git push -f origin hexo`
 
 - 如果想删除远程分支hexo
-`git push origin :hexo`
+  `git push origin :hexo`
 
 ### 最终效果
 
@@ -144,11 +149,10 @@ push完之后，此时你的Github代码库应该就有两个分支，一个默�
 `npm install`
 `npm install hexo-deployer-git`
 
-
 #### 参考
+
 [Hexo的版本控制与持续集成](https://formulahendry.github.io/2016/12/04/hexo-ci/)
 [hexo+github+AppVeyor实现不同电脑写博客](https://killerlei.github.io/2017/04/06/hexo-github-AppVeyor%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%90%8C%E7%94%B5%E8%84%91%E5%86%99%E5%8D%9A%E5%AE%A2/)
 [GitHub Pages + Hexo搭建博客](http://crazymilk.github.io/2015/12/28/GitHub-Pages-Hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/#more)
 [用 AppVeyor 持续集成 Github 中的 JS 项目](https://sebastianblade.com/using-appveyor-continuous-integration-in-javascript-project/)
 [利用 AppVeyor 实现 GitHub 托管项目的自动化集成](http://www.gulu-dev.com/post/2015-05-01-appveyor-ci)
-
