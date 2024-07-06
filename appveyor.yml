@@ -3,12 +3,14 @@ image:
   - Visual Studio 2022
 
 environment:
-  nodejs_version: 20
+  nodejs_version: 20.14.0
+  npm_version: 10.8.1
   access_token:
     secure: GEQgHcpB6CBoHNhKZisTu27ghM9+KTH0yqHbQkCyuZnPhlCGwZ0lhtu37S4dGuXs
 
 install:
   - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Product npm $env:npm_version
   - node --version
   - npm --version
   - npm install
