@@ -17,6 +17,7 @@ install:
   - npm install hexo-deployer-git --save
   # 解决偶尔出现"Error: Cannot find module 'hexo-util'"的问题
   - npm install hexo-util --save-dev 
+  - hexo --version
 
 build_script:
   - hexo generate
