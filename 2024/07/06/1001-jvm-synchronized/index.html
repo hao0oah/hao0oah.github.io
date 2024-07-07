@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-Hans">
+<html class="theme-next pisces use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -79,12 +79,12 @@
 
 
 
-<meta name="description" content="synchronized的使用synchronized关键字是Java中解决并发问题的一种常用方法，也是最简单的一种方法，其作用有三个:（1）互斥性：确保线程互斥的访问同步代码（2）可见性：保证共享变量的修改能够及时可见（3）有序性：有效解决重排序问题 其用法也有三个:  修饰实例方法 修饰静态方法 修饰代码块">
+<meta name="description" content="synchronized的使用synchronized关键字是Java中解决并发问题的一种常用方法，也是最简单的一种方法，其作用有三个:（1）互斥性：确保线程互斥的访问同步代码（2）可见性：保证共享变量的修改能够及时可见（3）有序性：有效解决重排序问题">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从jvm源码看synchronized底层原理">
 <meta property="og:url" content="http://yoursite.com/2024/07/06/1001-jvm-synchronized/index.html">
 <meta property="og:site_name" content="hao0oah&#39;s blog">
-<meta property="og:description" content="synchronized的使用synchronized关键字是Java中解决并发问题的一种常用方法，也是最简单的一种方法，其作用有三个:（1）互斥性：确保线程互斥的访问同步代码（2）可见性：保证共享变量的修改能够及时可见（3）有序性：有效解决重排序问题 其用法也有三个:  修饰实例方法 修饰静态方法 修饰代码块">
+<meta property="og:description" content="synchronized的使用synchronized关键字是Java中解决并发问题的一种常用方法，也是最简单的一种方法，其作用有三个:（1）互斥性：确保线程互斥的访问同步代码（2）可见性：保证共享变量的修改能够及时可见（3）有序性：有效解决重排序问题">
 <meta property="og:locale">
 <meta property="og:image" content="https://s2.loli.net/2024/07/07/tR5ZBSKoVGkrluJ.png">
 <meta property="og:image" content="https://s2.loli.net/2024/07/07/3QOPrJ7zvjo8W2E.png">
@@ -101,7 +101,7 @@
 <meta property="og:image" content="https://s2.loli.net/2024/07/07/pCgxR438Qz7aLjk.png">
 <meta property="og:image" content="https://s2.loli.net/2024/07/07/kWLBtOTyGjVJ1Rh.jpg">
 <meta property="article:published_time" content="2024-07-06T11:19:29.000Z">
-<meta property="article:modified_time" content="2024-07-07T03:21:13.015Z">
+<meta property="article:modified_time" content="2024-07-07T03:42:19.145Z">
 <meta property="article:author" content="hao0oah">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="多线程">
@@ -115,7 +115,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '',
-    scheme: 'Muse',
+    scheme: 'Pisces',
     version: '5.1.4',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
@@ -208,6 +208,26 @@
         </li>
       
         
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives/%20" rel="section">
             
@@ -255,7 +275,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -340,14 +360,14 @@
 
       
         <h3 id="synchronized的使用"><a href="#synchronized的使用" class="headerlink" title="synchronized的使用"></a>synchronized的使用</h3><p>synchronized关键字是Java中解决并发问题的一种常用方法，也是最简单的一种方法，其作用有三个:<br>（1）互斥性：确保线程互斥的访问同步代码<br>（2）可见性：保证共享变量的修改能够及时可见<br>（3）有序性：有效解决重排序问题</p>
+<span id="more"></span>
+
 <p>其用法也有三个:</p>
 <ol>
 <li>修饰实例方法</li>
 <li>修饰静态方法</li>
 <li>修饰代码块</li>
 </ol>
-<span id="more"></span>
-
 <h4 id="修饰实例方法"><a href="#修饰实例方法" class="headerlink" title="修饰实例方法"></a>修饰实例方法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Thread1</span> <span class="keyword">implements</span> <span class="title class_">Runnable</span>&#123;</span><br><span class="line">    <span class="comment">//共享资源(临界资源)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span> i=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果没有synchronized关键字，输出小于20000</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">increase</span><span class="params">()</span>&#123;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">10000</span>;j++)&#123;</span><br><span class="line">            increase();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">        Thread1 t=<span class="keyword">new</span> <span class="title class_">Thread1</span>();</span><br><span class="line">        Thread t1=<span class="keyword">new</span> <span class="title class_">Thread</span>(t);</span><br><span class="line">        Thread t2=<span class="keyword">new</span> <span class="title class_">Thread</span>(t);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">        t1.join();<span class="comment">//主线程等待t1执行完毕</span></span><br><span class="line">        t2.join();<span class="comment">//主线程等待t2执行完毕</span></span><br><span class="line">        System.out.println(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 输出结果:</span></span><br><span class="line"><span class="comment">     * 20000</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="修饰静态方法"><a href="#修饰静态方法" class="headerlink" title="修饰静态方法"></a>修饰静态方法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Thread1</span> &#123;</span><br><span class="line">    <span class="comment">//共享资源(临界资源)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果没有synchronized关键字，输出小于20000</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">increase</span><span class="params">()</span> &#123;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">        <span class="type">Thread</span> <span class="variable">t1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++) &#123;</span><br><span class="line">                    increase();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="type">Thread</span> <span class="variable">t2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++) &#123;</span><br><span class="line">                    increase();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">        t1.join();<span class="comment">//主线程等待t1执行完毕</span></span><br><span class="line">        t2.join();<span class="comment">//主线程等待t2执行完毕</span></span><br><span class="line">        System.out.println(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 输出结果:</span></span><br><span class="line"><span class="comment">     * 20000</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -446,11 +466,13 @@
 <h4 id="自旋"><a href="#自旋" class="headerlink" title="自旋"></a>自旋</h4><p>通过对源码的分析，发现多处存在自旋和tryLock操作，那么这些操作好不好，如果tryLock过少，大部分线程都会挂起，因为在拥有对象锁的线程释放锁后不能及时感知，导致用户态和核心态状态转换较多，效率低下，极限思维就是：没有自旋，所有线程挂起，如果tryLock过多，存在两个问题：1. 即使自旋避免了挂起，但是自旋的代价超过了挂起，得不偿失，那我还不如不要自旋了。 2. 如果自旋仍然不能避免大部分挂起的话，那就是又自旋又挂起，效率太低。极限思维就是：无限自旋，白白浪费了cpu资源，所以在代码中每个自旋和tryLock的插入应该都是经过测试后决定的。</p>
 <h4 id="编译期间锁优化"><a href="#编译期间锁优化" class="headerlink" title="编译期间锁优化"></a>编译期间锁优化</h4><ul>
 <li><p>锁消除<br>还是先看一下简洁的代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">test</span><span class="params">(String s1,String s2)</span> &#123;</span><br><span class="line">        <span class="type">StringBuffer</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">        sb.append(s1);</span><br><span class="line">        sb.append(s2);</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">test</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> String <span class="title function_">test</span><span class="params">(String s1,String s2)</span> &#123;</span><br><span class="line">      <span class="type">StringBuffer</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">      sb.append(s1);</span><br><span class="line">      sb.append(s2);</span><br><span class="line">      <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>sb的append方法是同步的，但是sb是在方法内部，每个运行的线程都会实例化一个StringBuilder对象，在私有栈持有该对象引用(其他线程无法得到)，也就是说sb不存在多线程访问，那么在jvm运行期间，即时编译器就会将锁消除,该过程依赖JIT的逃逸分析,此处不展开。</p>
 </li>
 <li><p>锁粗化<br>将前面的代码稍微变一下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">test</span> &#123;</span><br><span class="line">    <span class="type">StringBuffer</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">test</span><span class="params">(String s1,String s2)</span> &#123;</span><br><span class="line">        sb.append(s1);</span><br><span class="line">        sb.append(s2);      </span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">test</span> &#123;</span><br><span class="line">  <span class="type">StringBuffer</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">  <span class="keyword">public</span> String <span class="title function_">test</span><span class="params">(String s1,String s2)</span> &#123;</span><br><span class="line">      sb.append(s1);</span><br><span class="line">      sb.append(s2);      </span><br><span class="line">      <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>首先可以确定的是这段代码不能锁消除优化，因为sb是类的实例变量，会被多线程访问，存在线程安全问题，那么访问test方法的时候就会对sb对象，加锁，解锁，加锁，解锁，很显然这一过程将会大大降低效率，因此在即时编译的时候会进行锁粗化，在sb.appends(s1)之前加锁，在sb.append(s2)执行完后释放锁。</p>
 </li>
 </ul>
@@ -564,6 +586,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar2.jpg"
+                alt="" />
+            
               <p class="site-author-name" itemprop="name"></p>
               <p class="site-description motion-element" itemprop="description"></p>
           </div>
@@ -668,7 +694,7 @@
 
 
 
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
 
 
 
@@ -767,6 +793,13 @@
 
   
   
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
 
   
   <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
