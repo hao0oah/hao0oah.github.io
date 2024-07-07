@@ -18,6 +18,7 @@ install:
   - npm install hexo-deployer-git --save
   # 解决偶尔出现"Error: Cannot find module 'hexo-util'"的问题
   - npm install hexo-util --save-dev 
+  - npm install hexo-renderer-swig
   - npm update
 
 build_script:
