@@ -15,13 +15,13 @@ synchronized关键字是Java中解决并发问题的一种常用方法，也是�
 （2）可见性：保证共享变量的修改能够及时可见
 （3）有序性：有效解决重排序问题
 
+<!-- more -->
+
 其用法也有三个:
 
 1. 修饰实例方法
 2. 修饰静态方法
 3. 修饰代码块
-
-<!-- more -->
 
 #### 修饰实例方法
 
@@ -145,7 +145,7 @@ public class Thread1 implements Runnable{
 ![对象在堆内分布图](https://s2.loli.net/2024/07/07/tR5ZBSKoVGkrluJ.png)
 
 - 对象头
-Hotspot虚拟机的对象头包括两部分信息，第一部分用于储存对象自身的运行时数据，如哈希码，GC分代年龄，锁状态标志，锁指针等，这部分数据在32bit和64bit的虚拟机中大小分别为32bit和64bit，官方称它为"Mark word",考虑到虚拟机的空间效率，Mark Word被设计成一个非固定的数据结构以便在极小的空间中存储尽量多的信息，它会根据对象的状态复用自己的存储空间，详细情况如下图：
+  Hotspot虚拟机的对象头包括两部分信息，第一部分用于储存对象自身的运行时数据，如哈希码，GC分代年龄，锁状态标志，锁指针等，这部分数据在32bit和64bit的虚拟机中大小分别为32bit和64bit，官方称它为"Mark word",考虑到虚拟机的空间效率，Mark Word被设计成一个非固定的数据结构以便在极小的空间中存储尽量多的信息，它会根据对象的状态复用自己的存储空间，详细情况如下图：
   ![Mark_Word结构图](https://s2.loli.net/2024/07/07/3QOPrJ7zvjo8W2E.png)
 
 对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，如果对象访问定位方式是句柄访问，那么该部分没有，如果是直接访问，该部分保留。
@@ -156,7 +156,7 @@ Hotspot虚拟机的对象头包括两部分信息，第一部分用于储存对�
 ![直接访问方式](https://s2.loli.net/2024/07/07/4NK1ITV9aDkPZY7.png)
 
 - 内置锁(ObjectMonitor)
-通常所说的对象的内置锁，是对象头Mark Word中的重量级锁指针指向的monitor对象，该对象是在HotSpot底层C++语言编写的(openjdk里面看)，简单看一下代码：
+  通常所说的对象的内置锁，是对象头Mark Word中的重量级锁指针指向的monitor对象，该对象是在HotSpot底层C++语言编写的(openjdk里面看)，简单看一下代码：
 
 ```cpp
 //结构体如下
@@ -884,34 +884,39 @@ void ObjectMonitor::ExitEpilog (Thread * Self, ObjectWaiter * Wakee) {
 #### 编译期间锁优化
 
 - 锁消除
-还是先看一下简洁的代码
-```java
-public class test {
+  还是先看一下简洁的代码
+  
+  ```java
+  public class test {
     public String test(String s1,String s2) {
         StringBuffer sb = new StringBuffer();
         sb.append(s1);
         sb.append(s2);
         return sb.toString();
- }
-}
-```
-sb的append方法是同步的，但是sb是在方法内部，每个运行的线程都会实例化一个StringBuilder对象，在私有栈持有该对象引用(其他线程无法得到)，也就是说sb不存在多线程访问，那么在jvm运行期间，即时编译器就会将锁消除,该过程依赖JIT的逃逸分析,此处不展开。
+  }
+  }
+  ```
+  
+  sb的append方法是同步的，但是sb是在方法内部，每个运行的线程都会实例化一个StringBuilder对象，在私有栈持有该对象引用(其他线程无法得到)，也就是说sb不存在多线程访问，那么在jvm运行期间，即时编译器就会将锁消除,该过程依赖JIT的逃逸分析,此处不展开。
 
 - 锁粗化
-将前面的代码稍微变一下：
-```java
-public class test {
+  将前面的代码稍微变一下：
+  
+  ```java
+  public class test {
     StringBuffer sb = new StringBuffer();
     public String test(String s1,String s2) {
         sb.append(s1);
         sb.append(s2);      
         return sb.toString();
- }
-}
-```
-首先可以确定的是这段代码不能锁消除优化，因为sb是类的实例变量，会被多线程访问，存在线程安全问题，那么访问test方法的时候就会对sb对象，加锁，解锁，加锁，解锁，很显然这一过程将会大大降低效率，因此在即时编译的时候会进行锁粗化，在sb.appends(s1)之前加锁，在sb.append(s2)执行完后释放锁。
+  }
+  }
+  ```
+  
+  首先可以确定的是这段代码不能锁消除优化，因为sb是类的实例变量，会被多线程访问，存在线程安全问题，那么访问test方法的时候就会对sb对象，加锁，解锁，加锁，解锁，很显然这一过程将会大大降低效率，因此在即时编译的时候会进行锁粗化，在sb.appends(s1)之前加锁，在sb.append(s2)执行完后释放锁。
 
 ### 总结
+
 **引入偏向锁的目的**：在只有单线程执行情况下，尽量减少不必要的轻量级锁执行路径，轻量级锁的获取及释放依赖多次CAS原子指令，而偏向锁只依赖一次CAS原子指令置换ThreadID，之后只要判断线程ID为当前线程即可，偏向锁使用了一种等到竞争出现才释放锁的机制，消除偏向锁的开销还是蛮大的。如果同步资源或代码一直都是多线程访问的，那么消除偏向锁这一步骤对你来说就是多余的，可以通过-XX:-UseBiasedLocking=false来关闭
 **引入轻量级锁的目的**：在多线程交替执行同步块的情况下，尽量避免重量级锁引起的性能消耗(用户态和核心态转换)，但是如果多个线程在同一时刻进入临界区，会导致轻量级锁膨胀升级重量级锁，所以轻量级锁的出现并非是要替代重量级锁
 **重入**:对于不同级别的锁都有重入策略，偏向锁:单线程独占，重入只用检查threadId等于该线程；轻量级锁：重入将栈帧中lock record的header设置为null，重入退出，只用弹出栈帧，直到最后一个重入退出CAS写回数据释放锁；重量级锁：重入_recursions++，重入退出_recursions--，_recursions=0时释放锁
@@ -919,4 +924,5 @@ public class test {
 ![synchronized流程图](https://s2.loli.net/2024/07/07/kWLBtOTyGjVJ1Rh.jpg)
 
 ### 参考资料
+
 转自：https://www.cnblogs.com/kundeg/p/8422557.html
