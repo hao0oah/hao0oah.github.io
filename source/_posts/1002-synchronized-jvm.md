@@ -1,152 +1,24 @@
 ---
 title: 从jvm源码看synchronized底层原理
-date: 2024-07-06 19:19:29
+date: 2024-07-07 19:19:29
 tags:
     - Java
+    - synchronized
     - 多线程
     - 并发编程
 categories: Java
 ---
 
-### synchronized的使用
+#### 对象头和内置锁(ObjectMonitor)
 
-synchronized关键字是Java中解决并发问题的一种常用方法，也是最简单的一种方法，其作用有三个:
-（1）互斥性：确保线程互斥的访问同步代码
-（2）可见性：保证共享变量的修改能够及时可见
-（3）有序性：有效解决重排序问题
+根据jvm的分区，对象分配在堆内存中，其在64位机器的内存布局如下：
+![java对象内存布局](https://s2.loli.net/2024/07/12/KnqlFEpzM3INjS2.jpg)
 
 <!-- more -->
 
-其用法也有三个:
-
-1. 修饰实例方法
-2. 修饰静态方法
-3. 修饰代码块
-
-#### 修饰实例方法
-
-```java
-public class Thread1 implements Runnable{
-    //共享资源(临界资源)
-    static int i=0;
-
-    //如果没有synchronized关键字，输出小于20000
-    public synchronized void increase(){
-        i++;
-    }
-    public void run() {
-        for(int j=0;j<10000;j++){
-            increase();
-        }
-    }
-    public static void main(String[] args) throws InterruptedException {
-        Thread1 t=new Thread1();
-        Thread t1=new Thread(t);
-        Thread t2=new Thread(t);
-        t1.start();
-        t2.start();
-        t1.join();//主线程等待t1执行完毕
-        t2.join();//主线程等待t2执行完毕
-        System.out.println(i);
-    }
-    /**
-     * 输出结果:
-     * 20000
-     */
-}
-```
-
-#### 修饰静态方法
-
-```java
-public class Thread1 {
-    //共享资源(临界资源)
-    static int i = 0;
-
-    //如果没有synchronized关键字，输出小于20000
-    public static synchronized void increase() {
-        i++;
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Thread t1 = new Thread(new Runnable() {
-            public void run() {
-                for (int j = 0; j < 10000; j++) {
-                    increase();
-                }
-            }
-        });
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int j = 0; j < 10000; j++) {
-                    increase();
-                }
-            }
-        });
-        t1.start();
-        t2.start();
-        t1.join();//主线程等待t1执行完毕
-        t2.join();//主线程等待t2执行完毕
-        System.out.println(i);
-    }
-    /**
-     * 输出结果:
-     * 20000
-     */
-}
-```
-
-#### 修饰代码块
-
-```java
-public class Thread1 implements Runnable{
-    //共享资源(临界资源)
-    static int i=0;
-
-
-    @Override
-    public void run() {
-        for(int j=0;j<10000;j++){
-            //获得了String的类锁
-            synchronized (String.class){
-            i++;}
-        }
-    }
-    public static void main(String[] args) throws InterruptedException {
-        Thread1 t=new Thread1();
-        Thread t1=new Thread(t);
-        Thread t2=new Thread(t);
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
-        System.out.println(i);
-    }
-    /**
-     * 输出结果:
-     * 20000
-     */
-}
-```
-
-#### 总结
-
-1. synchronized修饰的实例方法，多线程并发访问时，只能有一个线程进入，获得对象内置锁，其他线程阻塞等待。
-2. synchronized修饰的静态方法，多线程并发访问时，只能有一个线程进入，获得类锁，其他线程阻塞等待。
-3. synchronized修饰的代码块，多线程并发访问时，只能有一个线程进入，根据括号中的对象或者是类，获得相应的对象内置锁或者是类锁。
-4. 每个类都有一个类锁，类的每个对象也有一个内置锁，它们是互不干扰的，也就是说一个线程可以同时获得类锁和该类实例化对象的内置锁，当线程访问非synchronzied修饰的方法时，并不需要获得锁，因此不会产生阻塞。
-
-### synchronized的底层原理
-
-#### 对象头和内置锁(ObjectMonitor)
-
-根据jvm的分区，对象分配在堆内存中，可以用下图表示：
-![对象在堆内分布图](https://s2.loli.net/2024/07/07/tR5ZBSKoVGkrluJ.png)
-
-- 对象头
-  Hotspot虚拟机的对象头包括两部分信息，第一部分用于储存对象自身的运行时数据，如哈希码，GC分代年龄，锁状态标志，锁指针等，这部分数据在32bit和64bit的虚拟机中大小分别为32bit和64bit，官方称它为"Mark word",考虑到虚拟机的空间效率，Mark Word被设计成一个非固定的数据结构以便在极小的空间中存储尽量多的信息，它会根据对象的状态复用自己的存储空间，详细情况如下图：
-  ![Mark_Word结构图](https://s2.loli.net/2024/07/07/3QOPrJ7zvjo8W2E.png)
+- **对象头**
+  `Hotspot`虚拟机的对象头包括两部分，第一部分用于储存对象自身的运行时数据，如哈希码、`GC`分代年龄、锁状态标志、锁指针等，这部分数据在`32bit`和`64bit`的虚拟机中大小分别为`32bit`和`64bit`，官方称它为**`Mark word`**。考虑到虚拟机的空间效率，**`Mark word`**被设计成一个非固定的数据结构以便在极小的空间中存储尽量多的信息，它会根据对象的状态复用自己的存储空间，详细情况如下图：
+  ![markword](https://s2.loli.net/2024/07/12/Gvtx435lKOZCgsz.jpg)
 
 对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，如果对象访问定位方式是句柄访问，那么该部分没有，如果是直接访问，该部分保留。
 句柄访问方式如下图：
@@ -155,8 +27,8 @@ public class Thread1 implements Runnable{
 直接访问如下图：
 ![直接访问方式](https://s2.loli.net/2024/07/07/4NK1ITV9aDkPZY7.png)
 
-- 内置锁(ObjectMonitor)
-  通常所说的对象的内置锁，是对象头Mark Word中的重量级锁指针指向的monitor对象，该对象是在HotSpot底层C++语言编写的(openjdk里面看)，简单看一下代码：
+- **内置锁(`ObjectMonitor`)**
+  我们通常所说的对象的内置锁，是对象头**`Mark word`**中的重量级锁指针指向的`monitor`对象，该对象是在`HotSpot`底层使用`C++`语言编写的，`openjdk`源码中`ObjectMonitor`结构如下：
 
 ```cpp
 //结构体如下
@@ -180,7 +52,7 @@ ObjectMonitor::ObjectMonitor() {
 }  
 ```
 
-ObjectMonitor队列之间的关系转换可以用下图表示：
+`ObjectMonitor`队列之间的关系转换可以用下图表示：
 ![monitor内部队列转换](https://s2.loli.net/2024/07/07/4sinHu5yZXP7GJd.png)
 
 既然提到了_waitSet和_EntryList(_cxq队列后面会说)，那就看一下底层的wait和notify方法
