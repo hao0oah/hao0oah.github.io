@@ -1,5 +1,5 @@
 ---
-title: 从jvm源码看ReentrantLock锁的实现原理
+title: 从jvm源码看ReentrantLock实现原理
 date: 2024-07-12 19:19:29
 tags:
     - Java

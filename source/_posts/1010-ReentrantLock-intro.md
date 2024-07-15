@@ -1,5 +1,5 @@
 ---
-title: ReentrantLock锁入门和实践
+title: ReentrantLock入门和实践
 date: 2024-07-11 19:19:29
 tags:
     - Java

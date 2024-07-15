@@ -9,43 +9,47 @@ tags:
 categories: Java
 ---
 
-#### 对象头和内置锁(ObjectMonitor)
+###  前言
+
+前面介绍了`synchronized`的用法和基本实现原理，`synchronized`是通过JVM内部的监视器锁(`monitor`)来实现的，但是监视器锁本质又是依赖于底层操作系统的`Mutex Lock`来实现的，而操作系统实现线程之间的切换就需要从用户态转换到内核态，这个成本非常高，状态之间的转换需要相对比较长的时间，这就是为什么说`synchronized`效率低的原因。这种依赖于操作系统`Mutex Lock`所实现的锁我们称之为**重量级锁**，`JDK1.6`之后对`synchronized`做的种种优化，如**锁粗化**（`Lock Coarsening`）、**锁消除**（`Lock Elimination`）、**轻量级锁**（`Lightweight Locking`）、**偏向锁**（`Biased Locking`）、**适应性自旋**（`Adaptive Spinning`）等技术来减少锁操作的开销，下面将从JVM源码层面查看这些优化的实现原理。
+
+<!-- more -->
+
+### 对象头和内置锁(ObjectMonitor)
 
 根据jvm的分区，对象分配在堆内存中，其在64位机器的内存布局如下：
 ![java对象内存布局](https://s2.loli.net/2024/07/12/KnqlFEpzM3INjS2.jpg)
 
-<!-- more -->
+#### 对象头
+`Hotspot`虚拟机的对象头包括两部分，第一部分用于储存对象自身的运行时数据，如哈希码、`GC`分代年龄、锁状态标志、锁指针等，这部分数据在`32bit`和`64bit`的虚拟机中大小分别为`32bit`和`64bit`，官方称它为**`Mark word`**。考虑到虚拟机的空间效率，**`Mark word`**被设计成一个非固定的数据结构以便在极小的空间中存储尽量多的信息，它会根据对象的状态复用自己的存储空间，详细情况如下图：
+![markword](https://s2.loli.net/2024/07/12/Gvtx435lKOZCgsz.jpg)
 
-- **对象头**
-  `Hotspot`虚拟机的对象头包括两部分，第一部分用于储存对象自身的运行时数据，如哈希码、`GC`分代年龄、锁状态标志、锁指针等，这部分数据在`32bit`和`64bit`的虚拟机中大小分别为`32bit`和`64bit`，官方称它为**`Mark word`**。考虑到虚拟机的空间效率，**`Mark word`**被设计成一个非固定的数据结构以便在极小的空间中存储尽量多的信息，它会根据对象的状态复用自己的存储空间，详细情况如下图：
-  ![markword](https://s2.loli.net/2024/07/12/Gvtx435lKOZCgsz.jpg)
-
-对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，如果对象访问定位方式是句柄访问，那么该部分没有，如果是直接访问，该部分保留。
+对象头的另外一部分是类型指针(`klass pointer`)，即对象指向它的类元数据的指针，在`64bit`的虚拟机中如果开启指针压缩占用大小为`32bit`，否则为`64bit`。如果对象访问定位方式是句柄访问，那么该部分没有，如果是直接访问，该部分保留。
 句柄访问方式如下图：
-![句柄访问方式](https://s2.loli.net/2024/07/07/uhLcNV9aGWfFEp4.png)
+<img src="https://s2.loli.net/2024/07/07/uhLcNV9aGWfFEp4.png" alt="句柄访问方式" style="zoom:80%;" />
 
 直接访问如下图：
-![直接访问方式](https://s2.loli.net/2024/07/07/4NK1ITV9aDkPZY7.png)
+<img src="https://s2.loli.net/2024/07/07/4NK1ITV9aDkPZY7.png" alt="直接访问方式" style="zoom:80%;" />
 
-- **内置锁(`ObjectMonitor`)**
-  我们通常所说的对象的内置锁，是对象头**`Mark word`**中的重量级锁指针指向的`monitor`对象，该对象是在`HotSpot`底层使用`C++`语言编写的，`openjdk`源码中`ObjectMonitor`结构如下：
+#### 内置锁(`ObjectMonitor`)
+我们通常所说的对象的内置锁，是对象头**`Mark word`**中的重量级锁指针指向的`monitor`对象，该对象是在`HotSpot`底层使用`C++`语言编写的，`C++`源码中`ObjectMonitor`结构如下：
 
-```cpp
+```c++
 //结构体如下
-ObjectMonitor::ObjectMonitor() {  
-  _header       = NULL;  
-  _count       = 0;  
-  _waiters      = 0,  
-  _recursions   = 0;       //线程的重入次数
-  _object       = NULL;  
-  _owner        = NULL;    //标识拥有该monitor的线程
-  _WaitSet      = NULL;    //等待线程组成的双向循环链表，_WaitSet是第一个节点
-  _WaitSetLock  = 0 ;  
-  _Responsible  = NULL ;  
-  _succ         = NULL ;  
-  _cxq          = NULL ;    //多线程竞争锁进入时的单向链表
+ObjectMonitor::ObjectMonitor() {
+  _header       = NULL;    // 对象头部，包含对象的标志位信息
+  _count        = 0;       // 锁的状态（锁计数），持有此锁的线程计数
+  _waiters      = 0,       // 等待线程的数量
+  _recursions   = 0;       // owner线程的重入次数，记录同一个线程多次获取同一个锁的次数。
+  _object       = NULL;    // 关联的对象，即该监视器所保护的对象。
+  _owner        = NULL;    // 标识拥有该monitor的线程，即当前正在执行临界区代码的线程。
+  _WaitSet      = NULL;    // 等待线程组成的双向循环链表,保存调用 wait() 方法的线程，_WaitSet是第一个节点
+  _WaitSetLock  = 0 ;   
+  _Responsible  = NULL ;    // 当前负责的线程，用于记录当前需要唤醒的线程。
+  _succ         = NULL ;    // 指向下一个要唤醒的线程
+  _cxq          = NULL ;    // 指向入口队列（Contention Queue），保存等待获取锁的线程列表，多线程竞争锁进入时的单向链表
   FreeNext      = NULL ;  
-  _EntryList    = NULL ;    //_owner从该双向循环链表中唤醒线程结点，_EntryList是第一个节点
+  _EntryList    = NULL ;    // 保存尝试获取锁但失败的线程，_owner从该双向循环链表中唤醒线程结点，_EntryList是第一个节点
   _SpinFreq     = 0 ;  
   _SpinClock    = 0 ;  
   OwnerIsThread = 0 ;  
@@ -55,11 +59,12 @@ ObjectMonitor::ObjectMonitor() {
 `ObjectMonitor`队列之间的关系转换可以用下图表示：
 ![monitor内部队列转换](https://s2.loli.net/2024/07/07/4sinHu5yZXP7GJd.png)
 
-既然提到了_waitSet和_EntryList(_cxq队列后面会说)，那就看一下底层的wait和notify方法
-wait方法的实现过程:
+既然提到了`_waitSet`和`_EntryList`(`_cxq`队列后面会说)，那就看一下底层的`wait()`和`notify()`方法。
 
-```cpp
-  //1.调用ObjectSynchronizer::wait方法
+- `wait()`方法的实现过程:
+
+```c++
+//1.调用ObjectSynchronizer::wait方法
 void ObjectSynchronizer::wait(Handle obj, jlong millis, TRAPS) {
   /*省略 */
   //2.获得Object的monitor对象(即内置锁)
@@ -69,8 +74,8 @@ void ObjectSynchronizer::wait(Handle obj, jlong millis, TRAPS) {
   monitor->wait(millis, true, THREAD);
   /*省略*/
 }
-  //4.在wait方法中调用addWaiter方法
-  inline void ObjectMonitor::AddWaiter(ObjectWaiter* node) {
+//4.在wait方法中调用addWaiter方法
+inline void ObjectMonitor::AddWaiter(ObjectWaiter* node) {
   /*省略*/
   if (_WaitSet == NULL) {
     //_WaitSet为null，就初始化_waitSet
@@ -88,22 +93,22 @@ void ObjectSynchronizer::wait(Handle obj, jlong millis, TRAPS) {
     node->_prev = tail;
   }
 }
-  //5.然后在ObjectMonitor::exit释放锁，接着 thread_ParkEvent->park  也就是wait
+//5.然后在ObjectMonitor::exit释放锁，接着 thread_ParkEvent->park  也就是wait
 ```
 
-总结：通过object获得内置锁(objectMonitor)，通过内置锁将Thread封装成OjectWaiter对象，然后addWaiter将它插入以_waitSet为首结点的等待线程链表中去，最后释放锁。
+**总结**：通过`object`获得内置锁(`objectMonitor`)，通过内置锁将`Thread`封装成`OjectWaiter`对象，然后`addWaiter()`将它插入以`_waitSet`为首结点的等待线程链表中去，最后释放锁。
 
-notify方法的底层实现
+- `notify()`方法的底层实现
 
-```cpp
-    //1.调用ObjectSynchronizer::notify方法
-    void ObjectSynchronizer::notify(Handle obj, TRAPS) {
+```c++
+//1.调用ObjectSynchronizer::notify方法
+void ObjectSynchronizer::notify(Handle obj, TRAPS) {
     /*省略*/
     //2.调用ObjectSynchronizer::inflate方法
     ObjectSynchronizer::inflate(THREAD, obj())->notify(THREAD);
 }
-    //3.通过inflate方法得到ObjectMonitor对象
-    ObjectMonitor * ATTR ObjectSynchronizer::inflate (Thread * Self, oop object) {
+//3.通过inflate方法得到ObjectMonitor对象
+ObjectMonitor * ATTR ObjectSynchronizer::inflate (Thread * Self, oop object) {
     /*省略*/
      if (mark->has_monitor()) {
           ObjectMonitor * inf = mark->monitor() ;
@@ -113,62 +118,30 @@ notify方法的底层实现
           return inf 
       }
     /*省略*/ 
-      }
-    //4.调用ObjectMonitor的notify方法
-    void ObjectMonitor::notify(TRAPS) {
+}
+//4.调用ObjectMonitor的notify方法
+void ObjectMonitor::notify(TRAPS) {
     /*省略*/
     //5.调用DequeueWaiter方法移出_waiterSet第一个结点
     ObjectWaiter * iterator = DequeueWaiter() ;
     //6.后面省略是将上面DequeueWaiter尾插入_EntrySet的操作
     /**省略*/
-  }
+}
 ```
 
-总结：通过object获得内置锁(objectMonitor)，调用内置锁的notify方法，通过_waitset结点移出等待链表中的首结点，将它置于_EntrySet中去，等待获取锁。注意：notifyAll根据policy不同可能移入_EntryList或者_cxq队列中，此处不详谈。
+**总结**：通过`object`获得内置锁(`objectMonitor`)，调用内置锁的`notify()`方法，通过`_waitset`结点移出等待链表中的首结点，将它置于`_EntrySet`中去，等待获取锁。
+
+**注意**：`notifyAll()`根据`policy`不同可能移入`_EntryList`或者`_cxq`队列中，此处不详谈。
+
+![入口队列和等待队列](https://s2.loli.net/2024/07/14/UOvi6k3jrx4afto.jpg)
 
 #### synchronized的底层原理
 
-- synchronized修饰代码块
-  通过下列简介的代码来分析：
-  
-  ```java
-  public class test{
-    public void testSyn(){
-        synchronized(this){
-        }
-    }
-  }
-  ```
-  
-  javac编译，javap -verbose反编译，结果如下：
-  
-  ```java
-  /**
-  * ...
-  **/
-  public void testSyn();
-    descriptor: ()V
-    flags: ACC_PUBLIC
-    Code:
-      stack=2, locals=3, args_size=1
-         0: aload_0              
-         1: dup                 
-         2: astore_1            
-         3: monitorenter        //申请获得对象的内置锁
-         4: aload_1             
-         5: monitorexit         //释放对象内置锁
-         6: goto          14
-         9: astore_2
-        10: aload_1
-        11: monitorexit         //释放对象内置锁
-        12: aload_2
-        13: athrow
-        14: return
-  ```
+此处我们只讨论重量级锁(`ObjectMonitor`)的获取情况，其他锁的获取放在后面`synchronzied`的优化中进行说明。
 
-此处我们只讨论了重量级锁(ObjectMonitor)的获取情况，其他锁的获取放在后面synchronzied的优化中进行说明。源码如下：
+`monitorenter`源码如下：
 
-```cpp
+```c++
 void ATTR ObjectMonitor::enter(TRAPS) {
   Thread * const Self = THREAD ;
   void * cur ;
@@ -181,12 +154,12 @@ void ATTR ObjectMonitor::enter(TRAPS) {
      return ;
   }
 
-//如果之前的_owner指向该THREAD，那么该线程是重入，_recursions++
+  //如果之前的_owner指向该THREAD，那么该线程是重入，_recursions++
   if (cur == Self) {
      _recursions ++ ;
      return ;
   }
-//如果当前线程是第一次进入该monitor，设置_recursions为1，_owner为当前线程
+  //如果当前线程是第一次进入该monitor，设置_recursions为1，_owner为当前线程
   if (Self->is_lock_owned ((address)cur)) {
     assert (_recursions == 0, "internal state error");
     _recursions = 1 ;   //_recursions标记为1
@@ -197,53 +170,24 @@ void ATTR ObjectMonitor::enter(TRAPS) {
   /**
   *此处省略锁的自旋优化等操作，统一放在后面synchronzied优化中说
   **/
-```
-
-总结：
-
-1. 如果monitor的进入数为0，则该线程进入monitor，然后将进入数设置为1，该线程即为monitor的owner
-2. 如果线程已经占有该monitor，只是重新进入，则进入monitor的进入数加1.
-3. 如果其他线程已经占用了monitor，则该线程进入阻塞状态，直到monitor的进入数为0，再重新尝试获取monitor的所有权
-- synchronized修饰方法
-
-还是从简洁的代码来分析：
-
-```java
-public class test{
-    public synchronized  void testSyn(){
-    }
 }
 ```
 
-javac编译，javap -verbose反编译，结果如下：
+**总结**：
 
-```java
- /**
- * ...
- **/
-  public synchronized void testSyn();
-    descriptor: ()V
-    flags: ACC_PUBLIC, ACC_SYNCHRONIZED
-    Code:
-      stack=0, locals=1, args_size=1
-         0: return
-      LineNumberTable:
-        line 3: 0
-```
-
-结果和synchronized修饰代码块的情况不同，仔细比较会发现多了ACC_SYNCHRONIZED这个标识，test.java通过javac编译形成的test.class文件，在该文件中包含了testSyn方法的方法表，其中ACC_SYNCHRONIZED标志位是1，当线程执行方法的时候会检查该标志位，如果为1，就自动的在该方法前后添加monitorenter和monitorexit指令，可以称为monitor指令的隐式调用。
-
-上面所介绍的通过synchronzied实现同步用到了对象的内置锁(ObjectMonitor)，而在ObjectMonitor的函数调用中会涉及到Mutex lock等特权指令，那么这个时候就存在操作系统用户态和核心态的转换，这种切换会消耗大量的系统资源，因为用户态与内核态都有各自专用的内存空间，专用的寄存器等，用户态切换至内核态需要传递给许多变量、参数给内核，内核也需要保护好用户态在切换时的一些寄存器值、变量等，这也是为什么早期的synchronized效率低的原因。在jdk1.6之后，从jvm层面做了很大的优化，下面主要介绍做了哪些优化。
+1. 如果`monitor`的进入数为0，则该线程进入`monitor`，然后将进入数设置为1，该线程即为`monitor`的`owner`
+2. 如果线程已经占有该`monitor`，只是重新进入，则进入monitor的进入数加1
+3. 如果其他线程已经占用了`monitor`，则该线程进入阻塞状态，直到`monitor`的进入数为0，再重新尝试获取`monitor`的所有权
 
 ### synchronized的优化
 
-在了解了synchronized重量级锁效率特别低之后，jdk自然做了一些优化，出现了偏向锁，轻量级锁，重量级锁，自旋等优化，我们应该改正monitorenter指令就是获取对象重量级锁的错误认识，很显然，优化之后，锁的获取判断次序是偏向锁->轻量级锁->重量级锁。
+在了解了`synchronized`重量级锁效率特别低之后，jdk1.6之后做了一些优化，出现了**偏向锁**，**轻量级锁**，**重量级锁**，**自旋**等优化，我们应该改正`monitorenter`指令就是获取对象重量级锁的错误认识，很显然，优化之后，锁的获取判断次序是**无锁**->**偏向锁**->**轻量级锁**->**重量级锁**。
 
 #### 偏向锁
 
 源码如下：
 
-```cpp
+```c++
 //偏向锁入口
 void ObjectSynchronizer::fast_enter(Handle obj, BasicLock* lock, bool attempt_rebias, TRAPS) {
  //UseBiasedLocking判断是否开启偏向锁
@@ -264,7 +208,7 @@ void ObjectSynchronizer::fast_enter(Handle obj, BasicLock* lock, bool attempt_re
 }
 ```
 
-BiasedLocking::revoke_and_rebias调用过程如下流程图：
+`BiasedLocking::revoke_and_rebias`调用过程如下流程图：
 ![revoke_and_rebias执行流程](https://s2.loli.net/2024/07/07/1r68BHOI7pVuLfg.png)
 
 偏向锁的撤销过程如下：
@@ -274,7 +218,7 @@ BiasedLocking::revoke_and_rebias调用过程如下流程图：
 
 轻量级锁获取源码：
 
-```cpp
+```c++
 //轻量级锁入口
 void ObjectSynchronizer::slow_enter(Handle obj, BasicLock* lock, TRAPS) {
   markOop mark = obj->mark();  //获得Mark Word
@@ -309,7 +253,7 @@ void ObjectSynchronizer::slow_enter(Handle obj, BasicLock* lock, TRAPS) {
 
 轻量级锁撤销源码：
 
-```cpp
+```c++
 void ObjectSynchronizer::fast_exit(oop object, BasicLock* lock, TRAPS) {
   assert(!object->mark()->has_bias_pattern(), "should not see bias pattern here");
   markOop dhw = lock->displaced_header();
@@ -347,7 +291,7 @@ void ObjectSynchronizer::fast_exit(oop object, BasicLock* lock, TRAPS) {
 
 源代码：
 
-```cpp
+```c++
 ObjectMonitor * ATTR ObjectSynchronizer::inflate (Thread * Self, oop object) {
   assert (Universe::verify_in_progress() ||
           !SafepointSynchronize::is_at_safepoint(), "invariant") ;
@@ -404,14 +348,15 @@ ObjectMonitor * ATTR ObjectSynchronizer::inflate (Thread * Self, oop object) {
 轻量级锁膨胀流程图：
 ![轻量级锁膨胀流程](https://s2.loli.net/2024/07/07/3esRLybcwaCpH1U.png)
 
-现在来回答下之前提出的问题：为什么在撤销轻量级锁的时候会有失败的可能？
-假设thread1拥有了轻量级锁，Mark Word指向thread1栈帧，thread2请求锁的时候，就会膨胀初始化ObjectMonitor对象，将Mark Word更新为指向ObjectMonitor的指针，那么在thread1退出的时候，CAS操作会失败，因为Mark Word不再指向thread1的栈帧，这个时候thread1自旋等待infalte完毕，执行重量级锁的退出操作
+- 为什么在撤销轻量级锁的时候会有失败的可能？
+
+假设thread1拥有了轻量级锁，`Mark Word`指向thread1栈帧，thread2请求锁的时候，就会膨胀初始化`ObjectMonitor`对象，将`Mark Word`更新为指向`ObjectMonitor`的指针，那么在thread1退出的时候，CAS操作会失败，因为Mark Word不再指向thread1的栈帧，这个时候thread1自旋等待infalte完毕，执行重量级锁的退出操作
 
 #### 重量级锁
 
 重量级锁的获取入口：
 
-```cpp
+```c++
 void ATTR ObjectMonitor::enter(TRAPS) {
   Thread * const Self = THREAD ;
   void * cur ;
@@ -458,9 +403,9 @@ void ATTR ObjectMonitor::enter(TRAPS) {
 }
 ```
 
-进入EnterI (TRAPS)方法(这段代码个人觉得很有意思):
+进入`EnterI (TRAPS)`方法(这段代码个人觉得很有意思):
 
-```cpp
+```c++
 void ATTR ObjectMonitor::EnterI (TRAPS) {
     Thread * Self = THREAD ;
     if (TryLock (Self) > 0) {
@@ -523,7 +468,7 @@ void ATTR ObjectMonitor::EnterI (TRAPS) {
 
 try了那么多次lock，接下来看下TryLock:
 
-```cpp
+```c++
 int ObjectMonitor::TryLock (Thread * Self) {
    for (;;) {
       void * own = _owner ;
@@ -543,7 +488,7 @@ int ObjectMonitor::TryLock (Thread * Self) {
 
 重量级锁的出口：
 
-```cpp
+```c++
 void ATTR ObjectMonitor::exit(TRAPS) {
    Thread * Self = THREAD ;
    if (THREAD != _owner) {
@@ -724,9 +669,9 @@ void ATTR ObjectMonitor::exit(TRAPS) {
 }
 ```
 
-ExitEpilog用来唤醒线程，代码如下：
+`ExitEpilog`用来唤醒线程，代码如下：
 
-```cpp
+```c++
 void ObjectMonitor::ExitEpilog (Thread * Self, ObjectWaiter * Wakee) {
    assert (_owner == Self, "invariant") ;
    _succ = Knob_SuccEnabled ? Wakee->_thread : NULL ;
@@ -751,50 +696,64 @@ void ObjectMonitor::ExitEpilog (Thread * Self, ObjectWaiter * Wakee) {
 
 #### 自旋
 
-通过对源码的分析，发现多处存在自旋和tryLock操作，那么这些操作好不好，如果tryLock过少，大部分线程都会挂起，因为在拥有对象锁的线程释放锁后不能及时感知，导致用户态和核心态状态转换较多，效率低下，极限思维就是：没有自旋，所有线程挂起，如果tryLock过多，存在两个问题：1. 即使自旋避免了挂起，但是自旋的代价超过了挂起，得不偿失，那我还不如不要自旋了。 2. 如果自旋仍然不能避免大部分挂起的话，那就是又自旋又挂起，效率太低。极限思维就是：无限自旋，白白浪费了cpu资源，所以在代码中每个自旋和tryLock的插入应该都是经过测试后决定的。
+通过对源码的分析，发现多处存在自旋和`tryLock`操作，那么这些操作好不好，如果`tryLock`过少，大部分线程都会挂起，因为在拥有对象锁的线程释放锁后不能及时感知，导致用户态和核心态状态转换较多，效率低下，极限思维就是：没有自旋，所有线程挂起，如果`tryLock`过多，存在两个问题：1. 即使自旋避免了挂起，但是自旋的代价超过了挂起，得不偿失，那我还不如不要自旋了。 2. 如果自旋仍然不能避免大部分挂起的话，那就是又自旋又挂起，效率太低。极限思维就是：无限自旋，白白浪费了cpu资源，所以在代码中每个自旋和`tryLock`的插入应该都是经过测试后决定的。
 
 #### 编译期间锁优化
 
-- 锁消除
+- **锁消除**
   还是先看一下简洁的代码
   
-  ```java
-  public class test {
+```java
+public class test {
     public String test(String s1,String s2) {
         StringBuffer sb = new StringBuffer();
         sb.append(s1);
         sb.append(s2);
         return sb.toString();
-  }
-  }
-  ```
-  
-  sb的append方法是同步的，但是sb是在方法内部，每个运行的线程都会实例化一个StringBuilder对象，在私有栈持有该对象引用(其他线程无法得到)，也就是说sb不存在多线程访问，那么在jvm运行期间，即时编译器就会将锁消除,该过程依赖JIT的逃逸分析,此处不展开。
+    }
+}
+```
 
-- 锁粗化
-  将前面的代码稍微变一下：
-  
-  ```java
-  public class test {
+sb的`append`方法是同步的，但是sb是在方法内部，每个运行的线程都会实例化一个`StringBuilder`对象，在私有栈持有该对象引用(其他线程无法得到)，也就是说sb不存在多线程访问，那么在jvm运行期间，即时编译器就会将锁消除，该过程依赖`JIT`的逃逸分析。
+
+- **锁粗化**
+将前面的代码稍微变一下：
+
+```java
+public class test {
     StringBuffer sb = new StringBuffer();
     public String test(String s1,String s2) {
         sb.append(s1);
         sb.append(s2);      
         return sb.toString();
-  }
-  }
-  ```
-  
-  首先可以确定的是这段代码不能锁消除优化，因为sb是类的实例变量，会被多线程访问，存在线程安全问题，那么访问test方法的时候就会对sb对象，加锁，解锁，加锁，解锁，很显然这一过程将会大大降低效率，因此在即时编译的时候会进行锁粗化，在sb.appends(s1)之前加锁，在sb.append(s2)执行完后释放锁。
+    }
+}
+```
+
+首先可以确定的是这段代码不能锁消除优化，因为sb是类的实例变量，会被多线程访问，存在线程安全问题，那么访问test方法的时候就会对sb对象，加锁，解锁，加锁，解锁，很显然这一过程将会大大降低效率，因此在即时编译的时候会进行锁粗化，在`sb.appends(s1)`之前加锁，在`sb.append(s2)`执行完后释放锁。
 
 ### 总结
 
 **引入偏向锁的目的**：在只有单线程执行情况下，尽量减少不必要的轻量级锁执行路径，轻量级锁的获取及释放依赖多次CAS原子指令，而偏向锁只依赖一次CAS原子指令置换ThreadID，之后只要判断线程ID为当前线程即可，偏向锁使用了一种等到竞争出现才释放锁的机制，消除偏向锁的开销还是蛮大的。如果同步资源或代码一直都是多线程访问的，那么消除偏向锁这一步骤对你来说就是多余的，可以通过-XX:-UseBiasedLocking=false来关闭
-**引入轻量级锁的目的**：在多线程交替执行同步块的情况下，尽量避免重量级锁引起的性能消耗(用户态和核心态转换)，但是如果多个线程在同一时刻进入临界区，会导致轻量级锁膨胀升级重量级锁，所以轻量级锁的出现并非是要替代重量级锁
-**重入**:对于不同级别的锁都有重入策略，偏向锁:单线程独占，重入只用检查threadId等于该线程；轻量级锁：重入将栈帧中lock record的header设置为null，重入退出，只用弹出栈帧，直到最后一个重入退出CAS写回数据释放锁；重量级锁：重入_recursions++，重入退出_recursions--，_recursions=0时释放锁
-最后放一张摘自网上的一张大图(保存本地,方便食用):
+
+**引入轻量级锁的目的**：在多线程交替执行同步块的情况下，尽量避免重量级锁引起的性能消耗(用户态和内核态转换)，但是如果多个线程在同一时刻进入临界区，会导致轻量级锁膨胀升级重量级锁，所以轻量级锁的出现并非是要替代重量级锁
+
+**重入**：对于不同级别的锁都有重入策略，偏向锁:单线程独占，重入只用检查threadId等于该线程；轻量级锁：重入将栈帧中lock record的header设置为null，重入退出，只用弹出栈帧，直到最后一个重入退出CAS写回数据释放锁；重量级锁：重入_recursions++，重入退出_recursions--，_recursions=0时释放锁。
+
+最后放一张摘自网上的一张大图
 ![synchronized流程图](https://s2.loli.net/2024/07/07/kWLBtOTyGjVJ1Rh.jpg)
 
 ### 参考资料
 
-转自：https://www.cnblogs.com/kundeg/p/8422557.html
+https://juejin.cn/post/7001483226678034439
+
+https://www.cnblogs.com/paddix/p/5405678.html
+
+https://www.cnblogs.com/kundeg/p/8422557.html
+
+https://www.cnblogs.com/javaminer/p/3889023.html
+
+https://shuyi.tech/archives/deep-insight-of-synchronized
+
+
+
