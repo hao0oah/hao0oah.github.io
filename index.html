@@ -251,7 +251,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2024/07/12/1004-ReentrantLock-jvm/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2024/07/12/1011-ReentrantLock-jvm/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="">
@@ -270,7 +270,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2024/07/12/1004-ReentrantLock-jvm/" itemprop="url">从jvm源码看ReentrantLock锁的实现原理</a></h1>
+                <a class="post-title-link" href="/2024/07/12/1011-ReentrantLock-jvm/" itemprop="url">从jvm源码看ReentrantLock实现原理</a></h1>
         
 
         <div class="post-meta">
@@ -346,7 +346,7 @@
           <p>JAVA里的锁有两大类，一类是<code>synchronized</code>锁，一类是<code>concurrent</code>包里的锁（<code>JUC锁</code>）。其中<code>synchronized</code>锁是JAVA语言层面提供的能力，本文主要讨论<code>JUC</code>里的<code>ReentrantLock</code>锁。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2024/07/12/1004-ReentrantLock-jvm/#more" rel="contents">
+            <a class="btn" href="/2024/07/12/1011-ReentrantLock-jvm/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -397,7 +397,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2024/07/11/1003-ReentrantLock-intro/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2024/07/11/1010-ReentrantLock-intro/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="">
@@ -416,7 +416,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2024/07/11/1003-ReentrantLock-intro/" itemprop="url">ReentrantLock锁入门和实践</a></h1>
+                <a class="post-title-link" href="/2024/07/11/1010-ReentrantLock-intro/" itemprop="url">ReentrantLock入门和实践</a></h1>
         
 
         <div class="post-meta">
@@ -492,7 +492,154 @@
           <p>JAVA里的锁有两大类，一类是<code>synchronized</code>锁，一类是<code>concurrent</code>包里的锁（<code>JUC锁</code>）。其中<code>synchronized</code>锁是JAVA语言层面提供的能力，本文主要讨论<code>JUC</code>里的<code>ReentrantLock</code>锁。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2024/07/11/1003-ReentrantLock-intro/#more" rel="contents">
+            <a class="btn" href="/2024/07/11/1010-ReentrantLock-intro/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2024/07/08/1003-synchronized-optimize/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hao0oah's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2024/07/08/1003-synchronized-optimize/" itemprop="url">synchronized优化原理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-07-08T19:19:29+08:00">
+                2024-07-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>前面介绍了从JVM源码看<code>synchronized</code>底层原理，讲的太乱太杂有点看不懂，先留着以后慢慢看。</p>
+<p>这篇主要讲解面试中常问到的知识点：锁的几种状态，锁的膨胀以及锁的优化等。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2024/07/08/1003-synchronized-optimize/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -635,7 +782,7 @@
 
       
         
-          <h4 id="对象头和内置锁-ObjectMonitor"><a href="#对象头和内置锁-ObjectMonitor" class="headerlink" title="对象头和内置锁(ObjectMonitor)"></a>对象头和内置锁(ObjectMonitor)</h4><p>根据jvm的分区，对象分配在堆内存中，其在64位机器的内存布局如下：<br><img src="https://s2.loli.net/2024/07/12/KnqlFEpzM3INjS2.jpg" alt="java对象内存布局"></p>
+          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>前面介绍了<code>synchronized</code>的用法和基本实现原理，<code>synchronized</code>是通过JVM内部的监视器锁(<code>monitor</code>)来实现的，但是监视器锁本质又是依赖于底层操作系统的<code>Mutex Lock</code>来实现的，而操作系统实现线程之间的切换就需要从用户态转换到内核态，这个成本非常高，状态之间的转换需要相对比较长的时间，这就是为什么说<code>synchronized</code>效率低的原因。这种依赖于操作系统<code>Mutex Lock</code>所实现的锁我们称之为<strong>重量级锁</strong>，<code>JDK1.6</code>之后对<code>synchronized</code>做的种种优化，如<strong>锁粗化</strong>（<code>Lock Coarsening</code>）、<strong>锁消除</strong>（<code>Lock Elimination</code>）、<strong>轻量级锁</strong>（<code>Lightweight Locking</code>）、<strong>偏向锁</strong>（<code>Biased Locking</code>）、<strong>适应性自旋</strong>（<code>Adaptive Spinning</code>）等技术来减少锁操作的开销，下面将从JVM源码层面查看这些优化的实现原理。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2024/07/07/1002-synchronized-jvm/#more" rel="contents">
@@ -781,10 +928,8 @@
 
       
         
-          <h3 id="synchronized-简介"><a href="#synchronized-简介" class="headerlink" title="synchronized 简介"></a>synchronized 简介</h3><p><code>synchronized</code> 是 Java 中的一种同步机制，用于防止多个线程同时访问共享资源。它可以用于方法和代码块，确保同一时间只有一个线程可以执行被 <code>synchronized</code> 保护的代码。</p>
-<h3 id="synchronized-的特性"><a href="#synchronized-的特性" class="headerlink" title="synchronized 的特性"></a>synchronized 的特性</h3><p><strong>原子性</strong>：<code>synchronized</code> 保证了被保护的代码块在一个线程执行期间不会被其他线程中断。</p>
-<p><strong>可见性</strong>：<code>synchronized</code> 确保在锁释放前对共享变量的修改对其他线程可见。</p>
-<p><strong>重入性</strong>：同一个线程可以多次获取同一把锁而不会被阻塞。</p>
+          <h3 id="synchronized-简介"><a href="#synchronized-简介" class="headerlink" title="synchronized 简介"></a>synchronized 简介</h3><p><code>synchronized</code> 是 Java 中的一种同步机制，用于防止多个线程同时访问共享资源。它可以用于方法和代码块，确保同一时间只有一个线程可以执行被 <code>synchronized</code> 保护的代码，同时还可以保证共享变量的内存可见性。</p>
+<p>Java中每一个对象都可以作为锁，这是<code>synchronized</code>实现同步的基础。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2024/07/06/1001-synchronized-intro/#more" rel="contents">
@@ -1321,7 +1466,7 @@
               
                 <a href="/archives/%20%7C%7C%20archive">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
