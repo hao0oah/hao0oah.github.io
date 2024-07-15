@@ -4,7 +4,8 @@ date: 2017-11-08 16:53:12
 tags:
     - 博客
     - Hexo
-categories: 博客
+categories:
+    - 博客
 ---
 
 > 本文是基于Windows平台，以最简单的步骤，展示我自己搭建的过程。

@@ -6,7 +6,8 @@ tags:
     - synchronized
     - 多线程
     - 并发编程
-categories: Java
+categories:
+    - Java
 ---
 
 ### synchronized 简介

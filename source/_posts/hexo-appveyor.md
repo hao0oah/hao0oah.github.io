@@ -5,7 +5,8 @@ tags:
     - 博客
     - AppVeyor
     - Hexo
-categories: 博客
+categories:
+    - 博客
 ---
 
 ### 前言
