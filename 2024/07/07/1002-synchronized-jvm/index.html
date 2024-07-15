@@ -83,7 +83,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="从jvm源码看synchronized底层原理">
 <meta property="og:url" content="http://yoursite.com/2024/07/07/1002-synchronized-jvm/index.html">
-<meta property="og:site_name" content="hao0oah&#39;s blog">
+<meta property="og:site_name" content="小同学的博客">
 <meta property="og:description" content="前言前面介绍了synchronized的用法和基本实现原理，synchronized是通过JVM内部的监视器锁(monitor)来实现的，但是监视器锁本质又是依赖于底层操作系统的Mutex Lock来实现的，而操作系统实现线程之间的切换就需要从用户态转换到内核态，这个成本非常高，状态之间的转换需要相对比较长的时间，这就是为什么说synchronized效率低的原因。这种依赖于操作系统Mutex L">
 <meta property="og:locale">
 <meta property="og:image" content="https://s2.loli.net/2024/07/12/KnqlFEpzM3INjS2.jpg">
@@ -102,7 +102,7 @@
 <meta property="og:image" content="https://s2.loli.net/2024/07/07/pCgxR438Qz7aLjk.png">
 <meta property="og:image" content="https://s2.loli.net/2024/07/07/kWLBtOTyGjVJ1Rh.jpg">
 <meta property="article:published_time" content="2024-07-07T11:19:29.000Z">
-<meta property="article:modified_time" content="2024-07-15T05:51:36.867Z">
+<meta property="article:modified_time" content="2024-07-15T14:48:08.160Z">
 <meta property="article:author" content="hao0oah">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="synchronized">
@@ -145,7 +145,7 @@
 
 
 
-  <title>从jvm源码看synchronized底层原理 | hao0oah's blog</title>
+  <title>从jvm源码看synchronized底层原理 | 小同学的博客</title>
   
 
 
@@ -175,12 +175,12 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">hao0oah's blog</span>
+        <span class="site-title">小同学的博客</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
       
-        <p class="site-subtitle">不管怎样的时光，都不算是浪费！</p>
+        <p class="site-subtitle">你走过的路每一步都算数</p>
       
   </div>
 
@@ -281,7 +281,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hao0oah's blog">
+      <meta itemprop="name" content="小同学的博客">
     </span>
 
     
@@ -662,7 +662,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
